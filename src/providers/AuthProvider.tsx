@@ -2,7 +2,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '../hooks/use-toast';
 
 interface AuthContextType {
   session: Session | null;

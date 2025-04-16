@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '@/integrations/supabase/client';
 import { Classroom } from '@/types';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '../hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/providers/AuthProvider';
 import { Switch } from '@/components/ui/switch';
