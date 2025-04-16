@@ -9,7 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Classroom } from '@/types';
 import { useToast } from '../hooks/use-toast';
 import { Button } from '@/components/ui/button';
-import { useAuth } from '@/providers/AuthProvider';
+import { useAuth } from '../providers/AuthProvider';
 import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';

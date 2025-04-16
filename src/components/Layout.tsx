@@ -4,7 +4,7 @@ import { Outlet } from 'react-router-dom';
 import Header from './Header';
 import AuthHeader from './AuthHeader';
 import Footer from './Footer';
-import { useAuth } from '@/providers/AuthProvider';
+import { useAuth } from '../providers/AuthProvider';
 import { motion } from 'framer-motion';
 
 const Layout = () => {
