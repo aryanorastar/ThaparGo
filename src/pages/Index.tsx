@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { MapPin, Calendar, Building, BookOpen } from 'lucide-react';
 import { useDatabaseSeed } from '../hooks/useDatabaseSeed';
 import { motion } from 'framer-motion';
