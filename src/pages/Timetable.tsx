@@ -11,7 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useAuth } from '@/providers/AuthProvider';
 import { Json } from '@/integrations/supabase/types';
-import { fetchSubjects } from '@/hooks/useDatabaseSeed';
+import { fetchSubjects } from '../hooks/useDatabaseSeed';
 
 const Timetable = () => {
   const [selectedBatch, setSelectedBatch] = useState<string>("");
