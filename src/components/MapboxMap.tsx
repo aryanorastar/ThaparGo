@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -11,19 +10,19 @@ interface Location {
 }
 
 interface MapboxMapProps {
-  mapboxToken: string;
-  onBuildingClick: (id: string) => void;
-  selectedBuildingId: string | null;
+  accessToken: string;
+  onMarkerClick: (id: string) => void;
+  selectedLocationId: string | null;
   locations: Location[];
-  center: [number, number]; // [longitude, latitude]
+  center?: [number, number]; // [longitude, latitude] - optional
 }
 
 const MapboxMap: React.FC<MapboxMapProps> = ({ 
-  mapboxToken, 
-  onBuildingClick, 
-  selectedBuildingId,
+  accessToken, 
+  onMarkerClick, 
+  selectedLocationId,
   locations,
-  center
+  center = [0, 0] // Default center if not provided
 }) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
@@ -32,9 +31,9 @@ const MapboxMap: React.FC<MapboxMapProps> = ({
 
   // Initialize the map
   useEffect(() => {
-    if (!mapboxToken || !mapContainer.current) return;
+    if (!accessToken || !mapContainer.current) return;
 
-    mapboxgl.accessToken = mapboxToken;
+    mapboxgl.accessToken = accessToken;
     
     const newMap = new mapboxgl.Map({
       container: mapContainer.current,
@@ -133,7 +132,7 @@ const MapboxMap: React.FC<MapboxMapProps> = ({
       Object.values(markers.current).forEach(marker => marker.remove());
       markers.current = {};
     };
-  }, [mapboxToken, center]);
+  }, [accessToken, center]);
 
   // Add markers once we have both the map and marker elements
   useEffect(() => {
@@ -150,7 +149,7 @@ const MapboxMap: React.FC<MapboxMapProps> = ({
       
       // Set up click handler
       el.onclick = () => {
-        onBuildingClick(location.id);
+        onMarkerClick(location.id);
       };
       
       // Create and add marker
@@ -160,7 +159,7 @@ const MapboxMap: React.FC<MapboxMapProps> = ({
       
       markers.current[location.id] = marker;
     });
-  }, [locations, markerElements, onBuildingClick, map.current]);
+  }, [locations, markerElements, onMarkerClick, map.current]);
 
   // Update marker styles when selected location changes
   useEffect(() => {
@@ -178,15 +177,15 @@ const MapboxMap: React.FC<MapboxMapProps> = ({
     });
     
     // Highlight selected marker
-    if (selectedBuildingId && markerElements[selectedBuildingId]) {
-      const el = markerElements[selectedBuildingId];
+    if (selectedLocationId && markerElements[selectedLocationId]) {
+      const el = markerElements[selectedLocationId];
       el.style.background = '#f59e0b'; // Amber color for selected
       el.style.width = '40px';
       el.style.height = '40px';
       el.style.zIndex = '10';
       
       // Fly to the selected location
-      const location = locations.find(loc => loc.id === selectedBuildingId);
+      const location = locations.find(loc => loc.id === selectedLocationId);
       if (location && map.current) {
         map.current.flyTo({
           center: location.coordinates,
@@ -197,7 +196,7 @@ const MapboxMap: React.FC<MapboxMapProps> = ({
         });
       }
     }
-  }, [selectedBuildingId, markerElements, locations]);
+  }, [selectedLocationId, markerElements, locations]);
 
   // Helper function to get color based on location type
   const getColorForLocationType = (type: string): string => {

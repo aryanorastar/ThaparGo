@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -6,7 +5,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { Button } from '@/components/ui/button';
 import { ChevronDown, ChevronUp, MapPin, School, Home, Utensils, Building } from 'lucide-react';
 import MapboxMap from '@/components/MapboxMap';
-import ThreeDMap from '@/components/ThreeDMap';
+import EnhancedThreeDMap from '@/components/EnhancedThreeDMap';
 import { supabase } from '@/integrations/supabase/client';
 
 interface Location {
@@ -86,7 +85,7 @@ const CampusMap = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-4">Campus Map</h1>
+      <h1 className="text-3xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-thapar-maroon to-purple-700">Campus Map</h1>
       <p className="text-lg mb-8">Explore the campus with our interactive 3D map.</p>
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -113,87 +112,77 @@ const CampusMap = () => {
                       type="text"
                       value={mapboxToken}
                       onChange={handleMapTokenChange}
+                      className="w-full p-2 border rounded-md text-sm"
                       placeholder="Enter your Mapbox access token"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                     />
-                    <p className="mt-1 text-sm text-gray-500">
-                      Get a token from <a href="https://account.mapbox.com/access-tokens/" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">Mapbox</a>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Get a token at <a href="https://account.mapbox.com/" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">mapbox.com</a>
                     </p>
                   </div>
                 )}
                 
-                <div className="h-[60vh] relative rounded-lg overflow-hidden">
-                  {loading ? (
-                    <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
-                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
-                    </div>
-                  ) : mapType === 'mapbox' ? (
-                    mapboxToken ? (
+                <TabsContent value="3d" className="h-[600px]">
+                  <EnhancedThreeDMap 
+                    onBuildingClick={handleBuildingClick}
+                    selectedBuildingId={selectedBuildingId}
+                  />
+                </TabsContent>
+                
+                <TabsContent value="mapbox">
+                  {mapboxToken ? (
+                    <div className="h-[600px] rounded-lg overflow-hidden">
                       <MapboxMap 
-                        mapboxToken={mapboxToken}
-                        onBuildingClick={handleBuildingClick}
-                        selectedBuildingId={selectedBuildingId}
+                        accessToken={mapboxToken}
                         locations={locations}
-                        center={[0, 0]}
+                        onMarkerClick={handleBuildingClick}
+                        selectedLocationId={selectedBuildingId}
                       />
-                    ) : (
-                      <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
-                        <div className="text-center p-4">
-                          <p className="text-lg font-medium mb-2">No Mapbox Token</p>
-                          <p className="mb-4">Please enter your Mapbox access token above to view the map.</p>
-                        </div>
-                      </div>
-                    )
+                    </div>
                   ) : (
-                    <ThreeDMap 
-                      onBuildingClick={handleBuildingClick}
-                      selectedBuildingId={selectedBuildingId}
-                    />
+                    <div className="flex items-center justify-center h-[600px] bg-gray-100 rounded-lg">
+                      <div className="text-center p-6">
+                        <MapPin className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                        <p className="text-gray-600 mb-2">Please enter a Mapbox access token to view the map</p>
+                        <p className="text-sm text-gray-500">
+                          Get a free token at <a href="https://account.mapbox.com/" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">mapbox.com</a>
+                        </p>
+                      </div>
+                    </div>
                   )}
-                </div>
+                </TabsContent>
               </Tabs>
             </CardContent>
           </Card>
-          
-          <div className="lg:hidden">
-            <Button
-              variant="outline"
-              className="w-full mb-4 flex items-center justify-between"
-              onClick={toggleInfo}
-            >
-              {showInfo ? 'Hide Building Info' : 'Show Building Info'}
-              {showInfo ? <ChevronUp className="ml-2 h-4 w-4" /> : <ChevronDown className="ml-2 h-4 w-4" />}
-            </Button>
-          </div>
         </div>
         
-        <div className={`lg:block ${showInfo ? 'block' : 'hidden'}`}>
-          <Card>
-            <CardHeader>
-              <CardTitle>Building Information</CardTitle>
-              <CardDescription>
-                Click on a building in the map to view details
-              </CardDescription>
+        <div>
+          <Card className="h-full">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <div>
+                <CardTitle>Building Information</CardTitle>
+                <CardDescription>Details about selected building</CardDescription>
+              </div>
+              <Button variant="ghost" size="sm" onClick={toggleInfo} className="h-8 w-8 p-0">
+                {showInfo ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+              </Button>
             </CardHeader>
             <CardContent>
-              {selectedBuilding ? (
-                <div>
-                  <div className="flex items-center mb-4">
+              {showInfo && selectedBuilding ? (
+                <div className="space-y-4">
+                  <div className="flex items-center">
                     {getTypeIcon(selectedBuilding.type)}
                     <h3 className="text-xl font-semibold ml-2">{selectedBuilding.name}</h3>
                   </div>
                   
-                  <div className="space-y-4">
+                  <div className="bg-gray-50 p-3 rounded-md">
+                    <p className="text-sm text-gray-700">{selectedBuilding.description}</p>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-3">
                     <div>
                       <p className="text-sm text-gray-500">Type</p>
                       <p>{selectedBuilding.type}</p>
                     </div>
-                    
-                    <div>
-                      <p className="text-sm text-gray-500">Description</p>
-                      <p>{selectedBuilding.description}</p>
-                    </div>
-                    
                     <div>
                       <p className="text-sm text-gray-500">Coordinates</p>
                       <p>X: {selectedBuilding.coordinates[0]}, Y: {selectedBuilding.coordinates[1]}</p>
@@ -214,7 +203,7 @@ const CampusMap = () => {
               <CardTitle>Building Directory</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-2">
+              <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2">
                 {locations.map(location => (
                   <div
                     key={location.id}
