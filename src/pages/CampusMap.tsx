@@ -4,7 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Button } from '@/components/ui/button';
 import { ChevronDown, ChevronUp, MapPin, School, Home, Utensils, Building } from 'lucide-react';
-import MapboxMap from '@/components/MapboxMap';
+import MapboxMap from '../components/MapboxMap';
 import EnhancedThreeDMap from '@/components/EnhancedThreeDMap';
 import { supabase } from '@/integrations/supabase/client';
 
