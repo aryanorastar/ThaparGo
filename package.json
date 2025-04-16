@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "build:dev": "vite build --mode development",
-    "build:react": "react-scripts build",
+    "build:react": "CI=false react-scripts build",
     "start": "react-scripts start",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
@@ -75,6 +75,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@eslint/js": "^8.56.0",
     "@tailwindcss/typography": "^0.5.15",
     "@types/node": "^22.5.5",
