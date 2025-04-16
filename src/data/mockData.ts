@@ -1,5 +1,5 @@
 
-import { Schedule, Classroom, RoomBooking, BatchData, Teacher } from "@/types";
+import { Schedule, Classroom, RoomBooking, BatchData, Teacher } from "../types";
 
 export const scheduleData: Schedule[] = [
   {

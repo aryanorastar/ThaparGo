@@ -11,7 +11,7 @@ import { Check, Clock, X } from 'lucide-react';
 import { useToast } from '../components/ui/use-toast';
 import { supabase } from '../integrations/supabase/client';
 import { useAuth } from '../providers/AuthProvider';
-import { RoomBooking } from '@/types';
+import { RoomBooking } from '../types';
 
 const RoomBookings = () => {
   const { toast } = useToast();

@@ -1,10 +1,10 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
+import { Button } from './ui/button';
 import { useAuth } from '../providers/AuthProvider';
 import { LogOut, User, Loader2 } from 'lucide-react';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from './ui/avatar';
 
 const AuthHeader: React.FC = () => {
   const { user, signOut, loading } = useAuth();
