@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from 'react';
 import { seedDatabase, createGetSubjectsFunction } from '@/scripts/seedDatabase';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '../integrations/supabase/client';
 
 export const useDatabaseSeed = () => {
   const [isSeeded, setIsSeeded] = useState(false);
