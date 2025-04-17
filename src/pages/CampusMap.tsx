@@ -145,21 +145,35 @@ const CampusMap = () => {
                     <TabsTrigger value="mapbox">Mapbox View</TabsTrigger>
                   </TabsList>
                   {mapType === 'mapbox' && (
-                    <div className="mb-4">
-                      <label htmlFor="mapbox-token" className="block text-sm font-medium mb-1">
+                    <div className="space-y-2 mb-5">
+                      <label 
+                        htmlFor="mapbox-token" 
+                        className="block text-sm font-medium text-gray-700"
+                      >
                         Mapbox Access Token
                       </label>
                       <input
                         id="mapbox-token"
+                        className="w-full h-11 px-4 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
+                        style={{ lineHeight: '44px' }}
                         type="text"
                         value={mapboxToken}
                         onChange={handleMapTokenChange}
-                        className="w-full min-h-[40px] px-3 py-2 border border-gray-300 rounded-md text-sm leading-snug"
-                        placeholder="Enter Mapbox access token"
-                        style={{ lineHeight: '1.25rem' }}
+                        placeholder="Enter your Mapbox access token"
+                        aria-describedby="token-help"
                       />
-                      <p className="text-xs text-gray-500 mt-2 mb-3 leading-tight">
-                        Get a token at <a href="https://account.mapbox.com/" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">mapbox.com</a>
+                      <small id="token-help" className="block mt-1 text-xs text-blue-600">
+                        <a href="https://account.mapbox.com/" target="_blank" rel="noopener noreferrer">
+                          Get a token at mapbox.com
+                        </a>
+                      </small>
+                    </div>
+                  )}
+                  {mapType === 'mapbox' && !mapboxToken && (
+                    <div className="flex flex-col items-center justify-center h-[450px] bg-gray-100 rounded-lg relative">
+                      <MapPin className="h-12 w-12 text-gray-300 mb-4" />
+                      <p className="text-gray-600 text-center px-5">
+                        Please enter a Mapbox access token to view the map
                       </p>
                     </div>
                   )}
@@ -172,7 +186,7 @@ const CampusMap = () => {
                     </div>
                   </TabsContent>
                   <TabsContent value="mapbox">
-                    {mapboxToken ? (
+                    {mapboxToken && (
                       <div className="w-full h-[450px]">
                         <MapboxMap 
                           locations={locations}
@@ -180,11 +194,6 @@ const CampusMap = () => {
                           onMarkerClick={handleBuildingClick}
                           selectedLocationId={selectedBuildingId}
                         />
-                      </div>
-                    ) : (
-                      <div className="flex items-center justify-center h-[450px] bg-gray-100 rounded-lg">
-                        <MapPin className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                        <p className="text-gray-500">Please enter a Mapbox access token to view the map</p>
                       </div>
                     )}
                   </TabsContent>
