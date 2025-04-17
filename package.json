@@ -12,6 +12,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "lint": "eslint .",
+    "type-check": "tsc --noEmit",
     "preview": "vite preview",
     "postinstall": "echo 'Installation completed successfully!'"
   },

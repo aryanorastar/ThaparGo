@@ -1,0 +1,22 @@
+name: Netlify Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy to Netlify
+        uses: nwtgck/actions-netlify@v2.0
+        with:
+          publish-dir: './dist'
+          production-branch: main
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          netlify-auth-token: "nfp_pVU7b7oSjnT6HGK7xfrbjXAAq8EYkaei6b7a"
+          netlify-site-id: "c6a139d6-546b-4c5c-84c7-171cbb3806f9"
