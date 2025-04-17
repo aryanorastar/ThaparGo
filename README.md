@@ -64,4 +64,4 @@ Made with ❤️ by [Aryan](mailto:aryangupts05@gmail.com)
 
 This project is licensed under the [Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International](https://creativecommons.org/licenses/by-nc-nd/4.0/) license.
 
-ThaparGo 2025 by Aryan Gupta
+ThaparGo © 2025 by Aryan Gupta
