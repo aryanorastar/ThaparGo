@@ -131,7 +131,7 @@ const CampusMap = () => {
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Map Section */}
-        <div className="lg:col-span-8 flex flex-col h-full self-start bg-white rounded-xl shadow p-4 mb-6 lg:mb-0">
+        <div className="lg:col-span-8 flex flex-col h-full self-start bg-white rounded-xl shadow p-4 mb-6 lg:mb-0 justify-center">
           <div className="mb-4">
             <div className="pb-2">
               <h2 className="text-2xl font-semibold">Map View</h2>
@@ -234,57 +234,7 @@ const CampusMap = () => {
             </CardContent>
           </Card>
         </div>
-        {/* Legend Section */}
-        <div className="lg:col-span-2 flex flex-col h-full self-start">
-          <Card className="h-full flex flex-col">
-            <CardHeader>
-              <Collapsible>
-                <CollapsibleTrigger asChild>
-                  <div className="flex justify-between items-center cursor-pointer">
-                    <CardTitle>Campus Map Legend</CardTitle>
-                    <ChevronDown className="h-5 w-5" />
-                  </div>
-                </CollapsibleTrigger>
-                <CardDescription>
-                  Understanding different building types and markers
-                </CardDescription>
-                <CollapsibleContent className="mt-4">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4">
-                    <div className="flex items-center">
-                      <div className="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center text-white mr-2">
-                        A
-                      </div>
-                      <span>Academic Buildings</span>
-                    </div>
-                    <div className="flex items-center">
-                      <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center text-white mr-2">
-                        R
-                      </div>
-                      <span>Residence Halls</span>
-                    </div>
-                    <div className="flex items-center">
-                      <div className="w-6 h-6 rounded-full bg-orange-500 flex items-center justify-center text-white mr-2">
-                        D
-                      </div>
-                      <span>Dining Facilities</span>
-                    </div>
-                    <div className="flex items-center">
-                      <div className="w-6 h-6 rounded-full bg-purple-500 flex items-center justify-center text-white mr-2">
-                        F
-                      </div>
-                      <span>Other Facilities</span>
-                    </div>
-                  </div>
-                  <div className="mt-4 p-3 bg-gray-50 rounded-md">
-                    <p className="text-sm">
-                      <span className="font-medium">Navigation Tips:</span> Click on any building to view detailed information. Use mouse to rotate, zoom, and pan around the campus map.
-                    </p>
-                  </div>
-                </CollapsibleContent>
-              </Collapsible>
-            </CardHeader>
-          </Card>
-        </div>
+
       </div>
     </div>
   );
