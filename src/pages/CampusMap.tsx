@@ -153,7 +153,7 @@ const CampusMap = () => {
           </div>
         </div>
         {/* Directory Section */}
-        <div className="lg:col-span-3 flex flex-col h-full self-start">
+        <div className="lg:col-span-2 flex flex-col h-full self-start">
           <Card className="h-full flex flex-col">
             <CardHeader>
               <CardTitle>Building Directory</CardTitle>
@@ -197,7 +197,7 @@ const CampusMap = () => {
           </Card>
         </div>
         {/* Legend Section */}
-        <div className="lg:col-span-3 flex flex-col h-full self-start">
+        <div className="lg:col-span-2 flex flex-col h-full self-start">
           <Card className="h-full flex flex-col">
             <CardHeader>
               <Collapsible>
