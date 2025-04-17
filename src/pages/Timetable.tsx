@@ -11,7 +11,8 @@ import { useToast } from '../hooks/use-toast';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
 import { useAuth } from '../providers/AuthProvider';
 import { Json } from '../integrations/supabase/types';
-import { fetchSubjects } from '../hooks/useDatabaseSeed';
+// import { fetchSubjects } from '../hooks/useDatabaseSeed';
+// NOTE: fetchSubjects is now handled outside the production bundle. See scripts/useDatabaseSeed.ts if needed.
 
 const Timetable = () => {
   const [selectedBatch, setSelectedBatch] = useState<string>("");
@@ -80,25 +81,11 @@ const Timetable = () => {
       }
     };
 
-    const getSubjects = async () => {
-      try {
-        const { data, error } = await fetchSubjects();
-        
-        if (error) {
-          console.error('Error fetching subjects:', error);
-          toast({
-            title: 'Error',
-            description: 'Failed to load subjects. Please try again later.',
-            variant: 'destructive',
-          });
-          return;
-        }
-        
-        setSubjects(data as Subject[]);
-      } catch (error) {
-        console.error('Error fetching subjects:', error);
-      }
-    };
+    // const getSubjects = async () => {
+    //   // fetchSubjects is now handled outside production code
+    // };
+    const getSubjects = async () => { /* no-op in production */ };
+
 
     fetchBatches();
     getSubjects();
