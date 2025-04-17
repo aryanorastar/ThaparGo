@@ -91,9 +91,47 @@ const CampusMap = () => {
       <h1 className="text-3xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-thapar-maroon to-purple-700">Campus Map</h1>
       <p className="text-lg mb-8">Explore the campus with our interactive 3D map.</p>
       
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+      {/* Legend Section (moved above map, always visible) */}
+      <div className="mb-6 w-full">
+        <Card className="w-full">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-lg">Campus Map Legend</CardTitle>
+            <CardDescription>Understanding different building types and markers</CardDescription>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <div className="flex flex-wrap gap-6">
+              <div className="flex flex-col gap-2 min-w-[180px]">
+                <span className="font-semibold text-gray-800">Academic</span>
+                <div className="flex items-center gap-3 group hover:bg-blue-50 rounded p-1 transition">
+                  <div className="w-7 h-7 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold text-base">A</div>
+                  <span className="text-base text-gray-900">Academic Buildings</span>
+                </div>
+              </div>
+              <div className="flex flex-col gap-2 min-w-[180px]">
+                <span className="font-semibold text-gray-800">Residential</span>
+                <div className="flex items-center gap-3 group hover:bg-green-50 rounded p-1 transition">
+                  <div className="w-7 h-7 rounded-full bg-green-500 flex items-center justify-center text-white font-bold text-base">R</div>
+                  <span className="text-base text-gray-900">Residence Halls</span>
+                </div>
+              </div>
+              <div className="flex flex-col gap-2 min-w-[180px]">
+                <span className="font-semibold text-gray-800">Facilities</span>
+                <div className="flex items-center gap-3 group hover:bg-orange-50 rounded p-1 transition">
+                  <div className="w-7 h-7 rounded-full bg-orange-500 flex items-center justify-center text-white font-bold text-base">D</div>
+                  <span className="text-base text-gray-900">Dining Facilities</span>
+                </div>
+                <div className="flex items-center gap-3 group hover:bg-purple-50 rounded p-1 transition">
+                  <div className="w-7 h-7 rounded-full bg-purple-500 flex items-center justify-center text-white font-bold text-base">F</div>
+                  <span className="text-base text-gray-900">Other Facilities</span>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Map Section */}
-        <div className="lg:col-span-7 flex flex-col h-full self-start">
+        <div className="lg:col-span-8 flex flex-col h-full self-start bg-white rounded-xl shadow p-4 mb-6 lg:mb-0">
           <div className="mb-4">
             <div className="pb-2">
               <h2 className="text-2xl font-semibold">Map View</h2>
