@@ -154,10 +154,10 @@ const CampusMap = () => {
                         type="text"
                         value={mapboxToken}
                         onChange={handleMapTokenChange}
-                        className="w-full p-2 border rounded-md text-sm"
+                        className="w-full p-2 border rounded-md text-sm h-10"
                         placeholder="Enter your Mapbox access token"
                       />
-                      <p className="text-xs text-gray-500 mt-1">
+                      <p className="text-xs text-gray-500 mt-2 mb-3">
                         Get a token at <a href="https://account.mapbox.com/" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">mapbox.com</a>
                       </p>
                     </div>
