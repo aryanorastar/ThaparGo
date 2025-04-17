@@ -129,69 +129,72 @@ const CampusMap = () => {
           </CardContent>
         </Card>
       </div>
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div className="content-wrapper grid lg:grid-cols-[70%_30%] gap-5 max-w-5xl mx-auto px-4">
         {/* Map Section */}
-        <div className="lg:col-span-8 flex flex-col h-full self-start bg-white rounded-xl shadow p-4 mb-6 lg:mb-0 justify-center">
-          <div className="mb-4">
-            <div className="pb-2">
-              <h2 className="text-2xl font-semibold">Map View</h2>
-              <span className="text-gray-500 text-sm">Select your preferred map type</span>
-            </div>
-            <div className="flex-1 flex flex-col">
-              <Tabs defaultValue={mapType} onValueChange={setMapType}>
-                <TabsList className="mb-4">
-                  <TabsTrigger value="3d">3D Model View</TabsTrigger>
-                  <TabsTrigger value="mapbox">Mapbox View</TabsTrigger>
-                </TabsList>
-                {mapType === 'mapbox' && (
-                  <div className="mb-4">
-                    <label htmlFor="mapbox-token" className="block text-sm font-medium mb-1">
-                      Mapbox Access Token
-                    </label>
-                    <input
-                      id="mapbox-token"
-                      type="text"
-                      value={mapboxToken}
-                      onChange={handleMapTokenChange}
-                      className="w-full p-2 border rounded-md text-sm"
-                      placeholder="Enter your Mapbox access token"
-                    />
-                    <p className="text-xs text-gray-500 mt-1">
-                      Get a token at <a href="https://account.mapbox.com/" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">mapbox.com</a>
-                    </p>
-                  </div>
-                )}
-                <TabsContent value="3d">
-                  <div className="w-full h-[450px]">
-                    <EnhancedThreeDMap 
-                      onBuildingClick={handleBuildingClick}
-                      selectedBuildingId={selectedBuildingId}
-                    />
-                  </div>
-                </TabsContent>
-                <TabsContent value="mapbox">
-                  {mapboxToken ? (
-                    <div className="w-full h-[450px]">
-                      <MapboxMap 
-                        locations={locations}
-                        accessToken={mapboxToken}
-                        onMarkerClick={handleBuildingClick}
-                        selectedLocationId={selectedBuildingId}
+        <div className="map-section space-y-4">
+          <div className="overflow-hidden max-h-[calc(100vh-250px)] rounded-lg mb-5">
+            <div className="mb-4">
+              <div className="pb-2">
+                <h2 className="text-2xl font-semibold">Map View</h2>
+                <span className="text-gray-500 text-sm">Select your preferred map type</span>
+              </div>
+              <div className="flex-1 flex flex-col">
+                <Tabs defaultValue={mapType} onValueChange={setMapType}>
+                  <TabsList className="mb-4">
+                    <TabsTrigger value="3d">3D Model View</TabsTrigger>
+                    <TabsTrigger value="mapbox">Mapbox View</TabsTrigger>
+                  </TabsList>
+                  {mapType === 'mapbox' && (
+                    <div className="mb-4">
+                      <label htmlFor="mapbox-token" className="block text-sm font-medium mb-1">
+                        Mapbox Access Token
+                      </label>
+                      <input
+                        id="mapbox-token"
+                        type="text"
+                        value={mapboxToken}
+                        onChange={handleMapTokenChange}
+                        className="w-full p-2 border rounded-md text-sm"
+                        placeholder="Enter your Mapbox access token"
                       />
-                    </div>
-                  ) : (
-                    <div className="flex items-center justify-center h-[450px] bg-gray-100 rounded-lg">
-                      <MapPin className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                      <p className="text-gray-500">Please enter a Mapbox access token to view the map</p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        Get a token at <a href="https://account.mapbox.com/" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">mapbox.com</a>
+                      </p>
                     </div>
                   )}
-                </TabsContent>
-              </Tabs>
+                  <TabsContent value="3d">
+                    <div className="w-full h-[450px]">
+                      <EnhancedThreeDMap 
+                        onBuildingClick={handleBuildingClick}
+                        selectedBuildingId={selectedBuildingId}
+                      />
+                    </div>
+                  </TabsContent>
+                  <TabsContent value="mapbox">
+                    {mapboxToken ? (
+                      <div className="w-full h-[450px]">
+                        <MapboxMap 
+                          locations={locations}
+                          accessToken={mapboxToken}
+                          onMarkerClick={handleBuildingClick}
+                          selectedLocationId={selectedBuildingId}
+                        />
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-center h-[450px] bg-gray-100 rounded-lg">
+                        <MapPin className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+                        <p className="text-gray-500">Please enter a Mapbox access token to view the map</p>
+                      </div>
+                    )}
+                  </TabsContent>
+                </Tabs>
+              </div>
             </div>
           </div>
         </div>
+
         {/* Directory Section */}
-        <div className="lg:col-span-2 flex flex-col h-full self-start">
+        <div className="p-4 bg-white rounded-lg shadow-sm h-fit">
           <Card className="h-full flex flex-col">
             <CardHeader>
               <CardTitle>Building Directory</CardTitle>
