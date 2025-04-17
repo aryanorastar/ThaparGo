@@ -91,15 +91,15 @@ const CampusMap = () => {
       <h1 className="text-3xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-thapar-maroon to-purple-700">Campus Map</h1>
       <p className="text-lg mb-8">Explore the campus with our interactive 3D map.</p>
       
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Map Section */}
-        <div className="lg:col-span-6 flex flex-col h-full">
-          <Card className="mb-4 flex-1 flex flex-col">
-            <CardHeader className="pb-2">
-              <CardTitle>Map View</CardTitle>
-              <CardDescription>Select your preferred map type</CardDescription>
-            </CardHeader>
-            <CardContent className="flex-1 flex flex-col">
+        <div className="lg:col-span-7 flex flex-col h-full justify-start">
+          <div className="mb-4">
+            <div className="pb-2">
+              <h2 className="text-2xl font-semibold">Map View</h2>
+              <span className="text-gray-500 text-sm">Select your preferred map type</span>
+            </div>
+            <div className="flex-1 flex flex-col">
               <Tabs defaultValue={mapType} onValueChange={setMapType}>
                 <TabsList className="mb-4">
                   <TabsTrigger value="3d">3D Model View</TabsTrigger>
@@ -149,8 +149,8 @@ const CampusMap = () => {
                   )}
                 </TabsContent>
               </Tabs>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
         {/* Directory Section */}
         <div className="lg:col-span-3 flex flex-col h-full">
@@ -166,7 +166,7 @@ const CampusMap = () => {
                 aria-label="Search buildings"
               />
             </CardHeader>
-            <CardContent className="flex-1 overflow-y-auto max-h-[500px] pr-2">
+            <CardContent className="flex-1 overflow-y-auto max-h-[500px] pr-2 p-4">
               <div className="space-y-2">
                 {locations
                   .filter(location =>
