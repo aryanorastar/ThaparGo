@@ -87,13 +87,13 @@ const CampusMap = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="mx-auto max-w-7xl px-2 lg:px-6 py-8">
       <h1 className="text-3xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-thapar-maroon to-purple-700">Campus Map</h1>
       <p className="text-lg mb-8">Explore the campus with our interactive 3D map.</p>
       
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Map Section */}
-        <div className="lg:col-span-7 flex flex-col h-full">
+        <div className="lg:col-span-6 flex flex-col h-full">
           <Card className="mb-4 flex-1 flex flex-col">
             <CardHeader className="pb-2">
               <CardTitle>Map View</CardTitle>
@@ -197,7 +197,7 @@ const CampusMap = () => {
           </Card>
         </div>
         {/* Legend Section */}
-        <div className="lg:col-span-2 flex flex-col h-full">
+        <div className="lg:col-span-3 flex flex-col h-full">
           <Card className="h-full flex flex-col">
             <CardHeader>
               <Collapsible>
