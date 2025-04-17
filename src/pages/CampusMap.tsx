@@ -19,9 +19,12 @@ interface Location {
 const CampusMap = () => {
   const [selectedBuildingId, setSelectedBuildingId] = useState<string | null>(null);
   const [showInfo, setShowInfo] = useState(true);
-  const [mapboxToken, setMapboxToken] = useState<string>('');
+  // Auto-load Mapbox token from env if available
+  const envMapboxToken = import.meta.env.VITE_MAPBOX_TOKEN as string | undefined;
+  const [mapboxToken, setMapboxToken] = useState<string>(envMapboxToken || '');
   const [mapType, setMapType] = useState('3d');
   const [locations, setLocations] = useState<Location[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -88,20 +91,20 @@ const CampusMap = () => {
       <h1 className="text-3xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-thapar-maroon to-purple-700">Campus Map</h1>
       <p className="text-lg mb-8">Explore the campus with our interactive 3D map.</p>
       
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
-          <Card className="mb-4">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Map Section */}
+        <div className="lg:col-span-7 flex flex-col h-full">
+          <Card className="mb-4 flex-1 flex flex-col">
             <CardHeader className="pb-2">
               <CardTitle>Map View</CardTitle>
               <CardDescription>Select your preferred map type</CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="flex-1 flex flex-col">
               <Tabs defaultValue={mapType} onValueChange={setMapType}>
                 <TabsList className="mb-4">
                   <TabsTrigger value="3d">3D Model View</TabsTrigger>
                   <TabsTrigger value="mapbox">Mapbox View</TabsTrigger>
                 </TabsList>
-                
                 {mapType === 'mapbox' && (
                   <div className="mb-4">
                     <label htmlFor="mapbox-token" className="block text-sm font-medium mb-1">
@@ -120,33 +123,28 @@ const CampusMap = () => {
                     </p>
                   </div>
                 )}
-                
-                <TabsContent value="3d" className="h-[600px]">
-                  <EnhancedThreeDMap 
-                    onBuildingClick={handleBuildingClick}
-                    selectedBuildingId={selectedBuildingId}
-                  />
+                <TabsContent value="3d">
+                  <div className="w-full h-[450px]">
+                    <EnhancedThreeDMap 
+                      onBuildingClick={handleBuildingClick}
+                      selectedBuildingId={selectedBuildingId}
+                    />
+                  </div>
                 </TabsContent>
-                
                 <TabsContent value="mapbox">
                   {mapboxToken ? (
-                    <div className="h-[600px] rounded-lg overflow-hidden">
+                    <div className="w-full h-[450px]">
                       <MapboxMap 
-                        accessToken={mapboxToken}
                         locations={locations}
+                        accessToken={mapboxToken}
                         onMarkerClick={handleBuildingClick}
                         selectedLocationId={selectedBuildingId}
                       />
                     </div>
                   ) : (
-                    <div className="flex items-center justify-center h-[600px] bg-gray-100 rounded-lg">
-                      <div className="text-center p-6">
-                        <MapPin className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                        <p className="text-gray-600 mb-2">Please enter a Mapbox access token to view the map</p>
-                        <p className="text-sm text-gray-500">
-                          Get a free token at <a href="https://account.mapbox.com/" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">mapbox.com</a>
-                        </p>
-                      </div>
+                    <div className="flex items-center justify-center h-[450px] bg-gray-100 rounded-lg">
+                      <MapPin className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+                      <p className="text-gray-500">Please enter a Mapbox access token to view the map</p>
                     </div>
                   )}
                 </TabsContent>
@@ -154,131 +152,102 @@ const CampusMap = () => {
             </CardContent>
           </Card>
         </div>
-        
-        <div>
-          <Card className="h-full">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <div>
-                <CardTitle>Building Information</CardTitle>
-                <CardDescription>Details about selected building</CardDescription>
-              </div>
-              <Button variant="ghost" size="sm" onClick={toggleInfo} className="h-8 w-8 p-0">
-                {showInfo ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-              </Button>
-            </CardHeader>
-            <CardContent>
-              {showInfo && selectedBuilding ? (
-                <div className="space-y-4">
-                  <div className="flex items-center">
-                    {getTypeIcon(selectedBuilding.type)}
-                    <h3 className="text-xl font-semibold ml-2">{selectedBuilding.name}</h3>
-                  </div>
-                  
-                  <div className="bg-gray-50 p-3 rounded-md">
-                    <p className="text-sm text-gray-700">{selectedBuilding.description}</p>
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <p className="text-sm text-gray-500">Type</p>
-                      <p>{selectedBuilding.type}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Coordinates</p>
-                      <p>X: {selectedBuilding.coordinates[0]}, Y: {selectedBuilding.coordinates[1]}</p>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="text-center py-8">
-                  <MapPin className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                  <p className="text-gray-500">Select a building on the map to view information</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-          
-          <Card className="mt-4">
+        {/* Directory Section */}
+        <div className="lg:col-span-3 flex flex-col h-full">
+          <Card className="h-full flex flex-col">
             <CardHeader>
               <CardTitle>Building Directory</CardTitle>
+              <input
+                type="text"
+                placeholder="Search buildings..."
+                className="mt-2 w-full border rounded-md px-2 py-1 text-sm"
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                aria-label="Search buildings"
+              />
             </CardHeader>
-            <CardContent>
-              <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2">
-                {locations.map(location => (
-                  <div
-                    key={location.id}
-                    className={`p-2 rounded-md cursor-pointer transition-colors ${
-                      selectedBuildingId === location.id
-                        ? 'bg-blue-100 border-l-4 border-blue-500'
-                        : 'hover:bg-gray-100'
-                    }`}
-                    onClick={() => handleBuildingClick(location.id)}
-                  >
-                    <div className="flex items-center">
-                      {getTypeIcon(location.type)}
-                      <span className="ml-2 font-medium">{location.name}</span>
+            <CardContent className="flex-1 overflow-y-auto max-h-[500px] pr-2">
+              <div className="space-y-2">
+                {locations
+                  .filter(location =>
+                    location.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    location.type.toLowerCase().includes(searchQuery.toLowerCase())
+                  )
+                  .map(location => (
+                    <div
+                      key={location.id}
+                      className={`p-2 rounded-md cursor-pointer transition-colors ${
+                        selectedBuildingId === location.id
+                          ? 'bg-blue-100 border-l-4 border-blue-500'
+                          : 'hover:bg-gray-100'
+                      }`}
+                      onClick={() => handleBuildingClick(location.id)}
+                    >
+                      <div className="flex items-center">
+                        {getTypeIcon(location.type)}
+                        <span className="ml-2 font-medium">{location.name}</span>
+                      </div>
+                      <div className="text-xs text-gray-500 ml-7">
+                        {location.type}
+                      </div>
                     </div>
-                    <div className="text-xs text-gray-500 ml-7">
-                      {location.type}
-                    </div>
-                  </div>
-                ))}
+                  ))}
               </div>
             </CardContent>
           </Card>
         </div>
+        {/* Legend Section */}
+        <div className="lg:col-span-2 flex flex-col h-full">
+          <Card className="h-full flex flex-col">
+            <CardHeader>
+              <Collapsible>
+                <CollapsibleTrigger asChild>
+                  <div className="flex justify-between items-center cursor-pointer">
+                    <CardTitle>Campus Map Legend</CardTitle>
+                    <ChevronDown className="h-5 w-5" />
+                  </div>
+                </CollapsibleTrigger>
+                <CardDescription>
+                  Understanding different building types and markers
+                </CardDescription>
+                <CollapsibleContent className="mt-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4">
+                    <div className="flex items-center">
+                      <div className="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center text-white mr-2">
+                        A
+                      </div>
+                      <span>Academic Buildings</span>
+                    </div>
+                    <div className="flex items-center">
+                      <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center text-white mr-2">
+                        R
+                      </div>
+                      <span>Residence Halls</span>
+                    </div>
+                    <div className="flex items-center">
+                      <div className="w-6 h-6 rounded-full bg-orange-500 flex items-center justify-center text-white mr-2">
+                        D
+                      </div>
+                      <span>Dining Facilities</span>
+                    </div>
+                    <div className="flex items-center">
+                      <div className="w-6 h-6 rounded-full bg-purple-500 flex items-center justify-center text-white mr-2">
+                        F
+                      </div>
+                      <span>Other Facilities</span>
+                    </div>
+                  </div>
+                  <div className="mt-4 p-3 bg-gray-50 rounded-md">
+                    <p className="text-sm">
+                      <span className="font-medium">Navigation Tips:</span> Click on any building to view detailed information. Use mouse to rotate, zoom, and pan around the campus map.
+                    </p>
+                  </div>
+                </CollapsibleContent>
+              </Collapsible>
+            </CardHeader>
+          </Card>
+        </div>
       </div>
-      
-      <Card className="mt-6">
-        <CardHeader>
-          <Collapsible>
-            <CollapsibleTrigger asChild>
-              <div className="flex justify-between items-center cursor-pointer">
-                <CardTitle>Campus Map Legend</CardTitle>
-                <ChevronDown className="h-5 w-5" />
-              </div>
-            </CollapsibleTrigger>
-            <CardDescription>
-              Understanding different building types and markers
-            </CardDescription>
-            
-            <CollapsibleContent className="mt-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="flex items-center">
-                  <div className="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center text-white mr-2">
-                    A
-                  </div>
-                  <span>Academic Buildings</span>
-                </div>
-                <div className="flex items-center">
-                  <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center text-white mr-2">
-                    R
-                  </div>
-                  <span>Residence Halls</span>
-                </div>
-                <div className="flex items-center">
-                  <div className="w-6 h-6 rounded-full bg-orange-500 flex items-center justify-center text-white mr-2">
-                    D
-                  </div>
-                  <span>Dining Facilities</span>
-                </div>
-                <div className="flex items-center">
-                  <div className="w-6 h-6 rounded-full bg-purple-500 flex items-center justify-center text-white mr-2">
-                    F
-                  </div>
-                  <span>Other Facilities</span>
-                </div>
-              </div>
-              
-              <div className="mt-4 p-3 bg-gray-50 rounded-md">
-                <p className="text-sm">
-                  <span className="font-medium">Navigation Tips:</span> Click on any building to view detailed information. Use mouse to rotate, zoom, and pan around the campus map.
-                </p>
-              </div>
-            </CollapsibleContent>
-          </Collapsible>
-        </CardHeader>
-      </Card>
     </div>
   );
 };
