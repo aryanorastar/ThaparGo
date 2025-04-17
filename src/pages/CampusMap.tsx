@@ -249,6 +249,12 @@ const CampusMap = () => {
         </div>
 
       </div>
+      <footer style={{ textAlign: 'center', padding: '1rem', fontSize: '0.8rem', color: '#666' }}>
+        ThaparGo &copy; 2025 by Aryan Gupta is licensed under 
+        <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" rel="noopener noreferrer">
+          Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International
+        </a>
+      </footer>
     </div>
   );
 };
