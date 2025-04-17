@@ -91,9 +91,9 @@ const CampusMap = () => {
       <h1 className="text-3xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-thapar-maroon to-purple-700">Campus Map</h1>
       <p className="text-lg mb-8">Explore the campus with our interactive 3D map.</p>
       
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
         {/* Map Section */}
-        <div className="lg:col-span-7 flex flex-col h-full justify-start">
+        <div className="lg:col-span-7 flex flex-col h-full self-start">
           <div className="mb-4">
             <div className="pb-2">
               <h2 className="text-2xl font-semibold">Map View</h2>
@@ -153,7 +153,7 @@ const CampusMap = () => {
           </div>
         </div>
         {/* Directory Section */}
-        <div className="lg:col-span-3 flex flex-col h-full">
+        <div className="lg:col-span-3 flex flex-col h-full self-start">
           <Card className="h-full flex flex-col">
             <CardHeader>
               <CardTitle>Building Directory</CardTitle>
@@ -197,7 +197,7 @@ const CampusMap = () => {
           </Card>
         </div>
         {/* Legend Section */}
-        <div className="lg:col-span-3 flex flex-col h-full">
+        <div className="lg:col-span-3 flex flex-col h-full self-start">
           <Card className="h-full flex flex-col">
             <CardHeader>
               <Collapsible>
