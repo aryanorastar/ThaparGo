@@ -21,6 +21,7 @@ const Header = () => {
     { path: '/timetable', label: 'Timetable' },
     { path: '/classrooms', label: 'Classrooms' },
     { path: '/bookings', label: 'Room Bookings' },
+    { path: '/societies-hub', label: 'Societies Hub' },
   ];
 
   return (

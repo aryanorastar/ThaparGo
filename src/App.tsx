@@ -11,6 +11,7 @@ import Timetable from "./pages/Timetable";
 import Classrooms from "./pages/Classrooms";
 import RoomBookings from "./pages/RoomBookings";
 import AdminBookings from "./pages/AdminBookings";
+import SocietiesHub from "./pages/SocietiesHub";
 import Auth from "./pages/Auth";
 import { AuthProvider } from "./providers/AuthProvider";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -51,6 +52,7 @@ const App = () => {
                       <AdminBookings />
                     </ProtectedRoute>
                   } />
+                  <Route path="/societies-hub" element={<SocietiesHub />} />
                   <Route path="/auth" element={<Auth />} />
                 </Route>
                 <Route path="*" element={<NotFound />} />
