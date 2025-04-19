@@ -25,7 +25,7 @@ const Societies = () => {
   
   // Form state
   const [name, setName] = useState('');
-  const [description: , setDescription] = useState('');
+  const [description, setDescription] = useState('');
   const [imageURL, setImageURL] = useState('');
   
   // Mumbai Testnet Chain ID
@@ -78,7 +78,7 @@ const Societies = () => {
   const handleCreateSociety = async (e.FormEvent) => {
     e.preventDefault();
     
-    if (!name || !description: ) {
+    if (!name || !description) {
       toast({
         title: 'Missing Fields',
         description: 'Please fill in all required fields.',
@@ -94,7 +94,7 @@ const Societies = () => {
       const finalImageURL = imageURL || 'https://via.placeholder.com/300?text=Society+Image';
       
       // Create society on blockchain
-      const societyId = await contractService.createSociety(name, description: , finalImageURL);
+      const societyId = await contractService.createSociety(name, description);
       
       if (societyId !== null) {
         toast({

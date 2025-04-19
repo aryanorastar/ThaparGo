@@ -4,7 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../components/ui/collapsible';
 import { Button } from '../components/ui/button';
 import { ChevronDown, ChevronUp, MapPin, School, Home, Utensils, Building } from 'lucide-react';
-import MapboxMap from '../components/MapboxMap';
+import ThaparMap from '../components/ThaparMap';
 import EnhancedThreeDMap from '../components/EnhancedThreeDMap';
 import { supabase } from '../integrations/supabase/client';
 
@@ -13,7 +13,7 @@ const CampusMap = () => {
   const [selectedBuildingId, setSelectedBuildingId] = useState(null);
   const [showInfo, setShowInfo] = useState(true);
   // Auto-load Mapbox token from env if available
-  const envMapboxToken = import.meta.env.VITE_MAPBOX_TOKEN as string | undefined;
+  const envMapboxToken = import.meta.env.VITE_MAPBOX_TOKEN;
   const [mapboxToken, setMapboxToken] = useState(envMapboxToken || '');
   const [mapType, setMapType] = useState('3d');
   const [locations, setLocations] = useState([]);
@@ -35,7 +35,7 @@ const CampusMap = () => {
         // Convert coordinates from array to tuple
         const formattedLocations = data.map(location => ({
           ...location,
-          coordinates.coordinates as unknown as [number, number]
+          coordinates: location.coordinates ? location.coordinates.coordinates : [0, 0]
         }));
         
         setLocations(formattedLocations);
@@ -58,13 +58,13 @@ const CampusMap = () => {
     setShowInfo(!showInfo);
   };
 
-  const handleMapTokenChange = (e.ChangeEvent) => {
+  const handleMapTokenChange = (e) => {
     setMapboxToken(e.target.value);
   };
 
   const selectedBuilding = selectedBuildingId 
     ? locations.find(building => building.id === selectedBuildingId) 
-    ;
+    : null;
 
   const getTypeIcon = (type) => {
     switch (type) {
@@ -89,7 +89,7 @@ const CampusMap = () => {
         <Card className="w-full">
           <CardHeader className="pb-2">
             <CardTitle className="text-lg">Campus Map Legend</CardTitle>
-            Understanding different building types and markers</CardDescription>
+            <CardDescription>Understanding different building types and markers</CardDescription>
           </CardHeader>
           <CardContent className="pt-0">
             <div className="flex flex-wrap gap-6">
@@ -148,7 +148,7 @@ const CampusMap = () => {
                       <input
                         id="mapbox-token"
                         className="w-full h-11 px-4 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
-                        style={{ lineHeight'44px' }}
+                        style={{ lineHeight: '44px' }}
                         type="text"
                         value={mapboxToken}
                         onChange={handleMapTokenChange}
@@ -181,7 +181,7 @@ const CampusMap = () => {
                   <TabsContent value="mapbox">
                     {mapboxToken && (
                       <div className="w-full h-[450px]">
-                        <MapboxMap 
+                        <ThaparMap 
                           locations={locations}
                           accessToken={mapboxToken}
                           onMarkerClick={handleBuildingClick}
@@ -199,14 +199,14 @@ const CampusMap = () => {
         {/* Directory Section */}
         <div className="p-4 bg-white rounded-lg shadow-sm h-fit">
           <Card className="h-full flex flex-col">
-            
-              Building Directory</CardTitle>
+            <CardHeader>
+              <CardTitle>Building Directory</CardTitle>
               <input
                 type="text"
                 placeholder="Search buildings..."
                 className="mt-2 w-full border rounded-md px-2 py-1 text-sm"
                 value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 aria-label="Search buildings"
               />
             </CardHeader>
@@ -223,7 +223,7 @@ const CampusMap = () => {
                       className={`p-2 rounded-md cursor-pointer transition-colors ${
                         selectedBuildingId === location.id
                           ? 'bg-blue-100 border-l-4 border-blue-500'
-                          'hover:bg-gray-100'
+                          : 'hover:bg-gray-100'
                       }`}
                       onClick={() => handleBuildingClick(location.id)}
                     >
@@ -242,7 +242,7 @@ const CampusMap = () => {
         </div>
 
       </div>
-      <footer style={{ textAlign'center', padding'1rem', fontSize'0.8rem', color'#666' }}>
+      <footer style={{ textAlign: 'center', padding: '1rem', fontSize: '0.8rem', color: '#666' }}>
         ThaparGo &copy; 2025 by Aryan Gupta is licensed under 
         <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" rel="noopener noreferrer">
           Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International

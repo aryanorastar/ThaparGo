@@ -14,194 +14,247 @@ import * as THREE from 'three';
 import { gsap } from 'gsap';
 
 
-
 // Define campus buildings with more details
 const campusBuildings = [
   // Academic Blocks
   { 
-    id'a-block', 
-    name'A Block', 
-    position[-15, 0, 0], 
-    dimensions[10, 8, 10], 
-    color'#D04848',
-    type'Academic',
-    details'Main academic block housing classrooms, labs, and faculty offices.'
+    id: 'a-block', 
+    name: 'A Block', 
+    position: [-15, 0, 0], 
+    dimensions: [10, 8, 10], 
+    color: '#D04848',
+    type: 'Academic',
+    details: 'Main academic block housing classrooms, labs, and faculty offices.'
   },
   { 
-    id'b-block', 
-    name'B Block', 
-    position[-5, 0, 5], 
-    dimensions[10, 6, 10], 
-    color'#F7B787',
-    type'Academic',
-    details'Houses computer science and IT departments with specialized labs.'
+    id: 'b-block', 
+    name: 'B Block', 
+    position: [-5, 0, 5], 
+    dimensions: [10, 6, 10], 
+    color: '#F7B787',
+    type: 'Academic',
+    details: 'Houses computer science and IT departments with specialized labs.'
   },
   { 
-    id'c-block', 
-    name'C Block', 
-    position[5, 0, 5], 
-    dimensions[10, 7, 10], 
-    color'#F7B787',
-    type'Academic',
-    details'Engineering departments and research facilities.'
+    id: 'c-block', 
+    name: 'C Block', 
+    position: [5, 0, 5], 
+    dimensions: [10, 7, 10], 
+    color: '#F7B787',
+    type: 'Academic',
+    details: 'Engineering departments and research facilities.'
   },
   { 
-    id'd-block', 
-    name'D Block', 
-    position[15, 0, 0], 
-    dimensions[10, 8, 10], 
-    color'#F7B787',
-    type'Academic',
-    details'Lecture halls and seminar rooms.'
+    id: 'd-block', 
+    name: 'D Block', 
+    position: [15, 0, 0], 
+    dimensions: [10, 8, 10], 
+    color: '#F7B787',
+    type: 'Academic',
+    details: 'Lecture halls and seminar rooms.'
   },
   { 
-    id'e-block', 
-    name'E Block', 
-    position[15, 0, -10], 
-    dimensions[10, 5, 10], 
-    color'#F7B787',
-    type'Academic',
-    details'Administrative offices and faculty chambers.'
+    id: 'e-block', 
+    name: 'E Block', 
+    position: [15, 0, -10], 
+    dimensions: [10, 5, 10], 
+    color: '#F7B787',
+    type: 'Academic',
+    details: 'Administrative offices and faculty chambers.'
   },
   { 
-    id'h-block', 
-    name'H Block', 
-    position[5, 0, -10], 
-    dimensions[10, 6, 10], 
-    color'#F7B787',
-    type'Academic',
-    details'Science labs and research centers.'
+    id: 'h-block', 
+    name: 'H Block', 
+    position: [5, 0, -10], 
+    dimensions: [10, 6, 10], 
+    color: '#F7B787',
+    type: 'Academic',
+    details: 'Science labs and research centers.'
   },
   { 
-    id'j-block', 
-    name'J Block', 
-    position[-5, 0, -10], 
-    dimensions[10, 7, 10], 
-    color'#F7B787',
-    type'Academic',
-    details'Management and humanities departments.'
+    id: 'j-block', 
+    name: 'J Block', 
+    position: [-5, 0, -10], 
+    dimensions: [10, 7, 10], 
+    color: '#F7B787',
+    type: 'Academic',
+    details: 'Management and humanities departments.'
   },
   { 
-    id'library', 
-    name'Central Library', 
-    position[-15, 0, -10], 
-    dimensions[10, 10, 10], 
-    color'#6499E9',
-    type'Academic',
-    details'Main library with study spaces, digital resources, and book collections.'
+    id: 'library', 
+    name: 'Central Library', 
+    position: [-15, 0, -10], 
+    dimensions: [10, 10, 10], 
+    color: '#6499E9',
+    type: 'Academic',
+    details: 'Main library with study spaces, digital resources, and book collections.'
   },
   
   // Hostels in a row at the back
   { 
-    id'hostel-a', 
-    name'Hostel A', 
-    position[-30, 0, -30], 
-    dimensions[8, 12, 8], 
-    color'#A6CF98',
-    type'Residence',
-    details'First-year undergraduate student housing with common areas and dining facilities.'
+    id: 'hostel-a', 
+    name: 'Hostel A', 
+    position: [-30, 0, -30], 
+    dimensions: [8, 12, 8], 
+    color: '#A6CF98',
+    type: 'Residence',
+    details: 'First-year undergraduate student housing with common areas and dining facilities.'
   },
   { 
-    id'hostel-b', 
-    name'Hostel B', 
-    position[-20, 0, -30], 
-    dimensions[8, 12, 8], 
-    color'#A6CF98',
-    type'Residence',
-    details'Second-year undergraduate student housing.'
+    id: 'hostel-b', 
+    name: 'Hostel B', 
+    position: [-20, 0, -30], 
+    dimensions: [8, 12, 8], 
+    color: '#A6CF98',
+    type: 'Residence',
+    details: 'Second-year undergraduate student housing.'
   },
   { 
-    id'hostel-c', 
-    name'Hostel C', 
-    position[-10, 0, -30], 
-    dimensions[8, 12, 8], 
-    color'#A6CF98',
-    type'Residence',
-    details'Third-year undergraduate student housing.'
+    id: 'hostel-c', 
+    name: 'Hostel C', 
+    position: [-10, 0, -30], 
+    dimensions: [8, 12, 8], 
+    color: '#A6CF98',
+    type: 'Residence',
+    details: 'Third-year undergraduate student housing.'
   },
   { 
-    id'hostel-d', 
-    name'Hostel D', 
-    position[0, 0, -30], 
-    dimensions[8, 12, 8], 
-    color'#A6CF98',
-    type'Residence',
-    details'Fourth-year undergraduate student housing.'
+    id: 'hostel-d', 
+    name: 'Hostel D', 
+    position: [0, 0, -30], 
+    dimensions: [8, 12, 8], 
+    color: '#A6CF98',
+    type: 'Residence',
+    details: 'Fourth-year undergraduate student housing.'
   },
   { 
-    id'hostel-e', 
-    name'Hostel E', 
-    position[10, 0, -30], 
-    dimensions[8, 12, 8], 
-    color'#A6CF98',
-    type'Residence',
-    details'Postgraduate student housing.'
+    id: 'hostel-e', 
+    name: 'Hostel E', 
+    position: [10, 0, -30], 
+    dimensions: [8, 12, 8], 
+    color: '#A6CF98',
+    type: 'Residence',
+    details: 'Postgraduate student housing.'
   },
   { 
-    id'hostel-f', 
-    name'Hostel F', 
-    position[20, 0, -30], 
-    dimensions[8, 12, 8], 
-    color'#A6CF98',
-    type'Residence',
-    details'Research scholar and PhD student housing.'
+    id: 'hostel-f', 
+    name: 'Hostel F', 
+    position: [20, 0, -30], 
+    dimensions: [8, 12, 8], 
+    color: '#A6CF98',
+    type: 'Residence',
+    details: 'Research scholar and PhD student housing.'
   },
   { 
-    id'hostel-g', 
-    name'Hostel G', 
-    position[30, 0, -30], 
-    dimensions[8, 12, 8], 
-    color'#A6CF98',
-    type'Residence',
-    details'International student housing with multicultural facilities.'
+    id: 'hostel-g', 
+    name: 'Hostel G', 
+    position: [30, 0, -30], 
+    dimensions: [8, 12, 8], 
+    color: '#A6CF98',
+    type: 'Residence',
+    details: 'International student housing with multicultural facilities.'
+  },
+  { 
+    id: 'hostel-j', 
+    name: 'J Hostel', 
+    position: [-20, 0, 20], 
+    dimensions: [10, 8, 10], 
+    color: '#F1C93B',
+    type: 'Hostel',
+    details: 'Male hostel with modern amenities.'
+  },
+  { 
+    id: 'hostel-k', 
+    name: 'K Hostel', 
+    position: [-10, 0, 20], 
+    dimensions: [10, 8, 10], 
+    color: '#F1C93B',
+    type: 'Hostel',
+    details: 'Female hostel with secure access.'
+  },
+  { 
+    id: 'hostel-l', 
+    name: 'L Hostel', 
+    position: [0, 0, 20], 
+    dimensions: [10, 8, 10], 
+    color: '#F1C93B',
+    type: 'Hostel',
+    details: 'Male hostel with recreational facilities.'
+  },
+  { 
+    id: 'hostel-m', 
+    name: 'M Hostel', 
+    position: [10, 0, 20], 
+    dimensions: [10, 8, 10], 
+    color: '#F1C93B',
+    type: 'Hostel',
+    details: 'Female hostel with study lounges.'
+  },
+  { 
+    id: 'hostel-n', 
+    name: 'N Hostel', 
+    position: [20, 0, 20], 
+    dimensions: [10, 8, 10], 
+    color: '#F1C93B',
+    type: 'Hostel',
+    details: 'Newly constructed co-ed hostel.'
+  },
+  {
+    id: 'international-hostel',
+    name: 'International Hostel',
+    position: [22, 0, 24],
+    dimensions: [8, 12, 8],
+    color: '#A6CF98',
+    type: 'Residence',
+    details: 'International student housing with multicultural facilities.'
   },
   
   // Other facilities
   { 
-    id'cafe', 
-    name'Cafeteria', 
-    position[0, 0, 15], 
-    dimensions[15, 4, 10], 
-    color'#FFB996',
-    type'Dining',
-    details'Main student cafeteria with multiple food options and seating areas.'
+    id: 'cafe', 
+    name: 'Cafeteria', 
+    position: [0, 0, 15], 
+    dimensions: [15, 4, 10], 
+    color: '#FFB996',
+    type: 'Dining',
+    details: 'Main student cafeteria with multiple food options and seating areas.'
   },
   { 
-    id'mess', 
-    name'Mess', 
-    position[0, 0, 25], 
-    dimensions[20, 5, 12], 
-    color'#FFCF81',
-    type'Dining',
-    details'Student dining hall serving breakfast, lunch, and dinner.'
+    id: 'mess', 
+    name: 'Mess', 
+    position: [0, 0, 25], 
+    dimensions: [20, 5, 12], 
+    color: '#FFCF81',
+    type: 'Dining',
+    details: 'Student dining hall serving breakfast, lunch, and dinner.'
   },
   { 
-    id'parking', 
-    name'Parking Area', 
-    position[25, 0, 25], 
-    dimensions[30, 1, 20], 
-    color'#808080', 
-    rotation.PI / 6,
-    type'Facility',
-    details'Main parking lot for students, faculty, and visitors.'
+    id: 'parking', 
+    name: 'Parking Area', 
+    position: [25, 0, 25], 
+    dimensions: [30, 1, 20], 
+    color: '#808080', 
+    rotation: Math.PI / 6,
+    type: 'Facility',
+    details: 'Main parking lot for students, faculty, and visitors.'
   },
   { 
-    id'sports-complex', 
-    name'Sports Complex', 
-    position[-25, 0, 15], 
-    dimensions[25, 3, 15], 
-    color'#7FB77E',
-    type'Facility',
-    details'Indoor and outdoor sports facilities including gym, swimming pool, and courts.'
+    id: 'sports-complex', 
+    name: 'Sports Complex', 
+    position: [-25, 0, 15], 
+    dimensions: [25, 3, 15], 
+    color: '#7FB77E',
+    type: 'Facility',
+    details: 'Indoor and outdoor sports facilities including gym, swimming pool, and courts.'
   },
   { 
-    id'auditorium', 
-    name'Auditorium', 
-    position[25, 0, -15], 
-    dimensions[18, 8, 12], 
-    color'#B1AFFF',
-    type'Facility',
-    details'Main auditorium for events, conferences, and performances.'
+    id: 'auditorium', 
+    name: 'Auditorium', 
+    position: [25, 0, -15], 
+    dimensions: [18, 8, 12], 
+    color: '#B1AFFF',
+    type: 'Facility',
+    details: 'Main auditorium for events, conferences, and performances.'
   },
 ];
 
@@ -225,7 +278,7 @@ const Ground = () => {
 };
 
 // Animated marker for points of interest
-const LocationMarker = ({ position, color = "#FF5252" }{ position[number, number, number], color? }) => {
+const LocationMarker = ({ position, color = "#FF5252" }) => {
   const ref = useRef(null);
   
   useFrame(({ clock }) => {
@@ -248,26 +301,18 @@ const LocationMarker = ({ position, color = "#FF5252" }{ position[number, number
 // Clouds for atmosphere
 const CloudsGroup = () => {
   return (
-    
+    <>
       <Cloud position={[-40, 30, -20]} speed={0.2} opacity={0.7} />
       <Cloud position={[40, 25, 10]} speed={0.1} opacity={0.7} />
       <Cloud position={[0, 35, -40]} speed={0.3} opacity={0.5} />
       <Cloud position={[20, 30, 30]} speed={0.2} opacity={0.6} />
       <Cloud position={[-30, 28, 20]} speed={0.25} opacity={0.5} />
-    </group>
+    </>
   );
 };
 
 // Building component with animations and interactions
-const BuildingMesh = ({ 
-  building, 
-  isSelected, 
-  onClick 
-}{ 
-  building, 
-  isSelected, 
-  onClick() => void 
-}) => {
+const BuildingMesh = ({ building, isSelected, onClick }) => {
   const meshRef = useRef(null);
   const [hovered, setHovered] = useState(false);
   
@@ -277,29 +322,29 @@ const BuildingMesh = ({
     
     if (isSelected) {
       gsap.to(meshRef.current.position, {
-        y.dimensions[1] * 0.1,
-        duration0.5,
-        ease"power2.out"
+        y: building.dimensions[1] * 0.1,
+        duration: 0.5,
+        ease: "power2.out"
       });
       gsap.to(meshRef.current.scale, {
-        x1.05,
-        y1.05,
-        z1.05,
-        duration0.5,
-        ease"power2.out"
+        x: 1.05,
+        y: 1.05,
+        z: 1.05,
+        duration: 0.5,
+        ease: "power2.out"
       });
     } else {
       gsap.to(meshRef.current.position, {
-        y0,
-        duration0.5,
-        ease"power2.out"
+        y: 0,
+        duration: 0.5,
+        ease: "power2.out"
       });
       gsap.to(meshRef.current.scale, {
-        x1,
-        y1,
-        z1,
-        duration0.5,
-        ease"power2.out"
+        x: 1,
+        y: 1,
+        z: 1,
+        duration: 0.5,
+        ease: "power2.out"
       });
     }
   }, [isSelected, building.dimensions]);
@@ -310,15 +355,15 @@ const BuildingMesh = ({
     
     if (hovered && !isSelected) {
       gsap.to(meshRef.current.position, {
-        y.dimensions[1] * 0.05,
-        duration0.3,
-        ease"power2.out"
+        y: building.dimensions[1] * 0.05,
+        duration: 0.3,
+        ease: "power2.out"
       });
     } else if (!isSelected) {
       gsap.to(meshRef.current.position, {
-        y0,
-        duration0.3,
-        ease"power2.out"
+        y: 0,
+        duration: 0.3,
+        ease: "power2.out"
       });
     }
   }, [hovered, isSelected, building.dimensions]);
@@ -345,8 +390,8 @@ const BuildingMesh = ({
           color={buildingColor} 
           roughness={0.7}
           metalness={0.1}
-          emissive={isSelected ? new THREE.Color("#FFFF00")  ? new THREE.Color(building.color).lerp(new THREE.Color("#FFFFFF"), 0.3)  THREE.Color("#000000")}
-          emissiveIntensity={isSelected ? 0.5  ? 0.2 0}
+          emissive={isSelected ? new THREE.Color("#FFFF00") : new THREE.Color(building.color).lerp(new THREE.Color("#FFFFFF"), 0.3)}
+          emissiveIntensity={isSelected ? 0.5 : (hovered ? 0.2 : 0)}
         />
       </mesh>
       
@@ -354,7 +399,7 @@ const BuildingMesh = ({
       <Text
         position={[0, building.dimensions[1] + 1, 0]}
         fontSize={1.2}
-        color={isSelected ? "#FF0000" "#000000"}
+        color={isSelected ? "#FF0000" : "#000000"}
         anchorX="center"
         anchorY="middle"
         outlineWidth={0.05}
@@ -373,7 +418,7 @@ const BuildingMesh = ({
         >
           <div className="bg-white/90 backdrop-blur-sm p-3 rounded-lg shadow-lg border border-gray-200 w-48 text-xs transform -translate-x-1/2">
             <h3 className="font-bold text-sm mb-1">{building.name}</h3>
-            <p className="text-gray-600 mb-1">Type{building.type}</p>
+            <p className="text-gray-600 mb-1">Type: {building.type}</p>
             {building.details && (
               <p className="text-gray-700">{building.details}</p>
             )}
@@ -425,7 +470,7 @@ const Roads = () => {
 };
 
 // Trees and vegetation
-const Tree = ({ position }{ position[number, number, number] }) => {
+const Tree = ({ position }) => {
   return (
     <group position={position}>
       {/* Tree trunk */}
@@ -447,7 +492,7 @@ const Tree = ({ position }{ position[number, number, number] }) => {
 const Vegetation = () => {
   // Generate random positions for trees
   const treePositions = useMemo(() => {
-    const positions[number, number, number][] = [];
+    const positions = [];
     for (let i = 0; i < 50; i++) {
       // Avoid placing trees on buildings or roads
       let x = (Math.random() - 0.5) * 100;
@@ -477,7 +522,7 @@ const Vegetation = () => {
   }, []);
   
   return (
-    
+    <group>
       {treePositions.map((position, index) => (
         <Tree key={index} position={position} />
       ))}
@@ -496,7 +541,7 @@ const Scene = ({ onBuildingClick, selectedBuildingId }) => {
   }, [camera]);
   
   return (
-    
+    <>
       {/* Environment and atmosphere */}
       <ambientLight intensity={0.5} />
       <directionalLight 
@@ -559,11 +604,11 @@ const EnhancedThreeDMap = ({ onBuildingClick, selectedBuildingId }) => {
       {/* Controls overlay */}
       <div className="absolute bottom-4 right-4 bg-white/80 backdrop-blur-sm p-3 rounded-lg shadow-md">
         <div className="text-xs text-gray-700 mb-2">
-          Controls:</strong></p>
-          • Left click + drag</p>
-          • Right click + drag</p>
-          • Scroll</p>
-          • Click on buildings for details</p>
+          <strong>Controls:</strong><br />
+          • Left click + drag<br />
+          • Right click + drag<br />
+          • Scroll<br />
+          • Click on buildings for details<br />
         </div>
       </div>
     </div>

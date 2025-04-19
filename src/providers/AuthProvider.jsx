@@ -4,9 +4,9 @@ import { supabase } from '../integrations/supabase/client.js';
 import { useToast } from '../hooks/use-toast.js';
 
 const AuthContext = createContext({
-  session: null,
-  user: null,
-  loading: true,
+  session,
+  user,
+  loading,
   signOut: () => {},
 });
 
@@ -20,7 +20,7 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     // Set up auth state listener first
-    const { data{ subscription } } = supabase.auth.onAuthStateChange(
+    const { subscription } = supabase.auth.onAuthStateChange(
       (event, session) => {
         console.log('Auth state changed:', event, session);
         setSession(session);
@@ -30,7 +30,7 @@ export const AuthProvider = ({ children }) => {
         if (event === 'SIGNED_IN') {
           toast({
             title: 'Signed in successfully',
-            description: `Welcome${session?.user?.email ? ` ${session.user.email}` ''}!`,
+            description: `Welcome${session?.user?.email ? ` ${session.user.email}` : ''}!`,
           });
         } else if (event === 'SIGNED_OUT') {
           toast({
@@ -42,14 +42,19 @@ export const AuthProvider = ({ children }) => {
     );
 
     // Then check for existing session
-    supabase.auth.getSession().then(({ data{ session } }) => {
+    supabase.auth.getSession().then(({ data }) => {
+      const session = data.session;
       console.log('Initial session:', session);
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      if (subscription && typeof subscription.unsubscribe === 'function') {
+        subscription.unsubscribe();
+      }
+    };
   }, [toast]);
 
   const signOut = async () => {

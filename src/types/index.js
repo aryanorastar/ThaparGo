@@ -1,5 +1,6 @@
 
-export interface NavItem {
+// TypeScript interfaces removed for JavaScript conversion
+
   title: ;
   href;
   icon?.ComponentType;

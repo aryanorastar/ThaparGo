@@ -1,9 +1,9 @@
-import { cn } from ".utils.jsx"
+import { cn } from "./utils.js"
 
 function Skeleton({
   className,
   ...props
-}.HTMLAttributes) {
+}) {
   return (
     <div
       className={cn("animate-pulse rounded-md bg-muted", className)}

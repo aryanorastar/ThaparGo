@@ -1,7 +1,7 @@
 
 import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
-import { Button } from "..components/ui/button.jsx.jsx";
+import { Button } from "../components/ui/button.jsx";
 import { Link } from "react-router-dom";
 
 const NotFound = () => {

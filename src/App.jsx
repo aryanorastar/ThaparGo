@@ -1,20 +1,20 @@
-import { Toaster } from "./components/ui/toaster.jsx.jsx";
-import { Toaster as Sonner } from "./components/ui/sonner.jsx.jsx";
-import { TooltipProvider } from "./components/ui/tooltip.jsx.jsx";
+import { Toaster } from './components/ui/toast.jsx';
+import { SonnerToast } from "./components/ui/sonner.jsx";
+import { TooltipProvider } from "./components/ui/tooltip.jsx";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Index from "./pages/Index.jsx.jsx";
-import NotFound from "./pages/NotFound.jsx.jsx";
-import Layout from "./components/Layout.jsx.jsx";
-import CampusMap from "./pages/CampusMap.jsx.jsx";
-import Timetable from "./pages/Timetable.jsx.jsx";
-import Classrooms from "./pages/Classrooms.jsx.jsx";
-import RoomBookings from "./pages/RoomBookings.jsx.jsx";
-import AdminBookings from "./pages/AdminBookings.jsx.jsx";
-import SocietiesHub from "./pages/SocietiesHub.jsx.jsx";
-import Auth from "./pages/Auth.jsx.jsx";
-import { AuthProvider } from "./providers/AuthProvider.jsx.jsx";
-import ProtectedRoute from "./components/ProtectedRoute.jsx.jsx";
+import Index from "./pages/Index.jsx";
+import NotFound from "./pages/NotFound.jsx";
+import Layout from "./components/Layout.jsx";
+import CampusMap from "./pages/CampusMap.jsx";
+import Timetable from "./pages/Timetable.jsx";
+import Classrooms from "./pages/Classrooms.jsx";
+import RoomBookings from "./pages/RoomBookings.jsx";
+import AdminBookings from "./pages/AdminBookings.jsx";
+import SocietiesHub from "./pages/SocietiesHub.jsx";
+import Auth from "./pages/Auth.jsx";
+import { AuthProvider } from "./providers/AuthProvider.jsx";
+import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import React from "react";
 
 // Create a client
@@ -35,8 +35,9 @@ const App = () => {
           <QueryClientProvider client={queryClient}>
             <TooltipProvider>
               <Toaster />
-              <Sonner />
+              <SonnerToast />
               <Routes>
+                <Route path="*" element={<NotFound />} />
                 <Route element={<Layout />}>
                   <Route path="/" element={<Index />} />
                   <Route path="/map" element={<CampusMap />} />
@@ -52,10 +53,9 @@ const App = () => {
                       <AdminBookings />
                     </ProtectedRoute>
                   } />
-                  <Route path="/societies-hub" element={<SocietiesHub />} />
+                  <Route path="/societies" element={<SocietiesHub />} />
                   <Route path="/auth" element={<Auth />} />
                 </Route>
-                <Route path="*" element={<NotFound />} />
               </Routes>
             </TooltipProvider>
           </QueryClientProvider>

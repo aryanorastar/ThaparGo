@@ -11,10 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Badge } from '../components/ui/badge';
 import { format } from 'date-fns';
 
-// Type for user roles to avoid TypeScript errors
-  user_id;
-  role;
-};
+// Note: In a TypeScript project, we would define user role types here
 
 const AdminBookings = () => {
   const { toast } = useToast();
@@ -102,17 +99,17 @@ const AdminBookings = () => {
       
       // Map the snake_case database fields to camelCase for our RoomBooking type
       const mappedBookings = data.map(item => ({
-        id.id,
-        roomId.room_id || '',
-        roomName.room_name,
-        purpose.purpose,
-        society.society,
-        date.date,
-        startTime.start_time,
-        endTime.end_time,
-        status.status as 'pending' | 'approved' | 'rejected',
-        userId.user_id,
-        createdAt.created_at
+        id: item.id,
+        roomId: item.room_id || '',
+        roomName: item.room_name,
+        purpose: item.purpose,
+        society: item.society,
+        date: item.date,
+        startTime: item.start_time,
+        endTime: item.end_time,
+        status: item.status,
+        userId: item.user_id,
+        createdAt: item.created_at
       }));
       
       setBookings(mappedBookings);
@@ -136,7 +133,7 @@ const AdminBookings = () => {
       
       const { error } = await supabase
         .from('room_bookings')
-        .update({ status'approved' })
+        .update({ status: 'approved' })
         .eq('id', bookingId);
       
       if (error) {
@@ -158,7 +155,7 @@ const AdminBookings = () => {
       setBookings(prevBookings => 
         prevBookings.map(booking => 
           booking.id === bookingId 
-            ? { ...booking, status'approved' } 
+            ? { ...booking, status: 'approved' } : booking
             
         )
       );
@@ -176,7 +173,7 @@ const AdminBookings = () => {
       
       const { error } = await supabase
         .from('room_bookings')
-        .update({ status'rejected' })
+        .update({ status: 'rejected' })
         .eq('id', bookingId);
       
       if (error) {
@@ -198,7 +195,7 @@ const AdminBookings = () => {
       setBookings(prevBookings => 
         prevBookings.map(booking => 
           booking.id === bookingId 
-            ? { ...booking, status'rejected' } 
+            ? { ...booking, status: 'rejected' } : booking
             
         )
       );
@@ -214,19 +211,19 @@ const AdminBookings = () => {
     switch (status) {
       case 'approved':
         return (
-          <Badge variant: ="outline" className="bg-green-100 text-green-800 hover:bg-green-100">
+          <Badge variant="outline" className="bg-green-100 text-green-800 hover:bg-green-100">
             <Check className="mr-1 h-3 w-3" /> Approved
           </Badge>
         );
       case 'rejected':
         return (
-          <Badge variant: ="outline" className="bg-red-100 text-red-800 hover:bg-red-100">
+          <Badge variant="outline" className="bg-red-100 text-red-800 hover:bg-red-100">
             <X className="mr-1 h-3 w-3" /> Rejected
           </Badge>
         );
       default:
         return (
-          <Badge variant: ="outline" className="bg-yellow-100 text-yellow-800 hover:bg-yellow-100">
+          <Badge variant="outline" className="bg-yellow-100 text-yellow-800 hover:bg-yellow-100">
             <Clock className="mr-1 h-3 w-3" /> Pending
           </Badge>
         );
@@ -245,7 +242,7 @@ const AdminBookings = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-6">
-        
+        <div>
           <h1 className="text-3xl font-bold">Admin Bookings</h1>
           <p className="text-muted-foreground mt-1">Manage room booking requests</p>
         </div>
@@ -257,7 +254,7 @@ const AdminBookings = () => {
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Filter by status" />
               </SelectTrigger>
-              
+              <SelectContent>
                 <SelectItem value="all">All Bookings</SelectItem>
                 <SelectItem value="pending">Pending</SelectItem>
                 <SelectItem value="approved">Approved</SelectItem>
@@ -266,7 +263,7 @@ const AdminBookings = () => {
             </Select>
           </div>
           
-          <Button variant: ="outline" onClick={fetchBookings} className="flex items-center">
+          <Button variant="outline" onClick={fetchBookings} className="flex items-center">
             <RefreshCw className="h-4 w-4 mr-2" />
             Refresh
           </Button>
@@ -288,58 +285,58 @@ const AdminBookings = () => {
                 <div className="col-span-2 flex justify-center py-12">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
                 </div>
-              ) .filter(b => tabValue === 'all' || b.status === tabValue).length > 0 ? (
+              ) : bookings.filter(b => tabValue === 'all' || b.status === tabValue).length > 0 ? (
                 bookings
                   .filter(booking => tabValue === 'all' || booking.status === tabValue)
                   .map(booking => (
                     <Card key={booking.id}>
-                      
+                      <CardHeader>
                         <div className="flex justify-between items-start">
-                          
-                            {booking.purpose}</CardTitle>
-                            {booking.society}</CardDescription>
+                          <div>
+                            <CardTitle>{booking.purpose}</CardTitle>
+                            <CardDescription>{booking.society}</CardDescription>
                           </div>
                           {getStatusBadge(booking.status)}
                         </div>
                       </CardHeader>
-                      
+                      <CardContent>
                         <div className="space-y-4">
-                          
+                          <div>
                             <h3 className="text-sm font-medium text-gray-500">Room</h3>
-                            {booking.roomName}</p>
+                            <p>{booking.roomName}</p>
                           </div>
                           
-                          
+                          <div>
                             <h3 className="text-sm font-medium text-gray-500">Date & Time</h3>
-                            {format(new Date(booking.date), 'PPP')}</p>
-                            {booking.startTime} - {booking.endTime}</p>
+                            <p>{format(new Date(booking.date), 'PPP')}</p>
+                            <p>{booking.startTime} - {booking.endTime}</p>
                           </div>
                           
-                          
+                          <div>
                             <h3 className="text-sm font-medium text-gray-500">Requested On</h3>
-                            {format(new Date(booking.createdAt), 'PPP p')}</p>
+                            <p>{format(new Date(booking.createdAt), 'PPP p')}</p>
                           </div>
                           
-                          
+                          <div>
                             <h3 className="text-sm font-medium text-gray-500">User ID</h3>
                             <p className="font-mono text-xs">{booking.userId}</p>
                           </div>
                         </div>
                       </CardContent>
-                      
+                      <CardFooter>
                         <div className="w-full flex justify-end space-x-2">
                           {booking.status === 'pending' && (
-                            
+                            <>
                               <Button 
-                                variant: ="outline" 
+                                variant="outline" 
                                 onClick={() => handleRejectBooking(booking.id)}
                                 disabled={processingBookingId === booking.id}
                                 className="border-red-200 text-red-700 hover:bg-red-50 hover:text-red-800"
                               >
                                 {processingBookingId === booking.id ? (
                                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-700"></div>
-                                ) (
-                                  
+                                ) : (
+                                  <>
                                     <X className="mr-1 h-4 w-4" /> Reject
                                   </>
                                 )}
@@ -351,8 +348,8 @@ const AdminBookings = () => {
                               >
                                 {processingBookingId === booking.id ? (
                                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                                ) (
-                                  
+                                ) : (
+                                  <>
                                     <Check className="mr-1 h-4 w-4" /> Approve
                                   </>
                                 )}
@@ -363,13 +360,13 @@ const AdminBookings = () => {
                       </CardFooter>
                     </Card>
                   ))
-              ) (
+              ) : (
                 <div className="col-span-2 text-center py-12">
                   <h3 className="text-xl font-medium mb-2">No Bookings Found</h3>
                   <p className="text-gray-500">
                     {tabValue === 'all' 
                       ? "There are no room booking requests in the system." 
-                      `There are no ${tabValue} booking requests.`}
+                      : `There are no ${tabValue} booking requests.`}
                   </p>
                 </div>
               )}

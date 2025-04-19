@@ -1,16 +1,37 @@
-import React, { useEffect, useRef, useState } from 'react';
-import mapboxgl from 'mapbox-gl';
-import 'mapbox-gl/dist/mapbox-gl.css';
+// MapboxMap.jsx is deprecated. Use ThaparMap.jsx instead.
+// import React, { useRef, useEffect, useState } from 'react';
+// import mapboxgl from 'mapbox-gl';
+// import 'mapbox-gl/dist/mapbox-gl.css';
+// 
+// mapboxgl.accessToken = 'YOUR_MAPBOX_ACCESS_TOKEN';
+// 
+// export default function MapboxMap({ center = [75.7873, 30.3528], zoom = 15 }) {
+// (File deprecated and all code commented out. Use ThaparMap.jsx instead.)
+        center: [lng, lat],
+        zoom: mapZoom
+      });
+      map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
+      map.current.on('move', () => {
+        setLng(map.current.getCenter().lng.toFixed(4));
+        setLat(map.current.getCenter().lat.toFixed(4));
+        setZoom(map.current.getZoom().toFixed(2));
+      });
+    }
+    return () => {
+      if (map.current) map.current.remove();
+    };
+  }, []);
 
+  return (
+    <div className="map-container">
+      <div className="sidebar">
+        Longitude: {lng} | Latitude: {lat} | Zoom: {mapZoom}
+      </div>
+      <div ref={mapContainer} className="map" style={{ height: '400px', width: '100%' }} />
+    </div>
+  );
+}
 
-
-const MapboxMap = ({ 
-  accessToken, 
-  onMarkerClick, 
-  selectedLocationId,
-  locations,
-  center = [0, 0] // Default center if not provided
-}) => {
   const mapContainer = useRef(null);
   const map = useRef(null);
   const markers = useRef({});

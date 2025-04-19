@@ -1,35 +1,32 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
-import { Button } from '../components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
+import { Button } from '../components/ui/button';
 import { Textarea } from '../components/ui/textarea';
-import { Check, Clock, X } from 'lucide-react';
-import { useToast } from '../components/ui/use-toast';
+import { useToast } from '../hooks/use-toast';
 import { supabase } from '../integrations/supabase/client';
 import { useAuth } from '../providers/AuthProvider';
 
 const RoomBookings = () => {
-  const { toast } = useToast();
-  const { user } = useAuth();
   const [bookings, setBookings] = useState([]);
   const [classrooms, setClassrooms] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const { toast } = useToast();
+  const { user } = useAuth();
   
-  // Form state
   const [formData, setFormData] = useState({
-    roomId'',
-    purpose'',
-    society'',
-    date'',
-    startTime'',
-    endTime'',
+    roomId: '',
+    purpose: '',
+    society: '',
+    date: '',
+    startTime: '',
+    endTime: '',
   });
   
-  // Fetch bookings
   useEffect(() => {
     const fetchBookings = async () => {
       try {
@@ -37,194 +34,172 @@ const RoomBookings = () => {
         
         const { data, error } = await supabase
           .from('room_bookings')
-          .select('*')
-          .eq('user_id', user.id);
+          .select('*, rooms:roomId(name)')
+          .eq('userId', user.id)
+          .order('created_at', { ascending: false });
         
         if (error) {
-          console.error('Error fetching bookings:', error);
           toast({
-            title: 'Error',
-            description: 'Failed to load bookings.',
+            title: 'Error fetching bookings',
+            description: error.message,
             variant: 'destructive',
           });
           return;
         }
         
-        // Map the snake_case database fields to camelCase for our RoomBooking type
-        const mappedBookings = data.map(item => ({
-          id.id,
-          roomId.room_id || '',
-          roomName.room_name,
-          purpose.purpose,
-          society.society,
-          date.date,
-          startTime.start_time,
-          endTime.end_time,
-          status.status as 'pending' | 'approved' | 'rejected',
-          userId.user_id,
-          createdAt.created_at
+        const formattedBookings = data.map(booking => ({
+          ...booking,
+          roomName: booking.rooms?.name || 'Unknown Room'
         }));
         
-        setBookings(mappedBookings);
+        setBookings(formattedBookings);
       } catch (error) {
-        console.error('Unexpected error:', error);
+        toast({
+          title: 'Unexpected error',
+          description: 'Failed to load bookings',
+          variant: 'destructive',
+        });
       } finally {
         setLoading(false);
       }
     };
-
+    
     const fetchClassrooms = async () => {
       try {
         const { data, error } = await supabase
           .from('classrooms')
-          .select('*');
+          .select('*')
+          .order('name');
         
         if (error) {
-          console.error('Error fetching classrooms:', error);
+          toast({
+            title: 'Error fetching classrooms',
+            description: error.message,
+            variant: 'destructive',
+          });
           return;
         }
         
-        setClassrooms(data as Classroom[]);
+        setClassrooms(data || []);
       } catch (error) {
-        console.error('Unexpected error:', error);
+        toast({
+          title: 'Unexpected error',
+          description: 'Failed to load classrooms',
+          variant: 'destructive',
+        });
       }
     };
-
+    
     fetchBookings();
     fetchClassrooms();
   }, [user, toast]);
   
-  // Handle form input changes
-  const handleInputChange = (e.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]
+      [name]: value
     }));
   };
-
-  // Handle switching to new booking tab
-  const switchToNewBookingTab = () => {
-    const element = document.querySelector('[data-value="new-booking"]');
-    if (element instanceof HTMLElement) {
-      element.click();
-    }
-  };
   
-  // Handle form submission
-  const handleSubmit = async (e.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Validate form
-    if (!formData.roomId || !formData.purpose || !formData.society || !formData.date || !formData.startTime || !formData.endTime) {
+    if (!user) {
       toast({
-        title: "Error",
-        description: "Please fill in all fields",
-        variant: "destructive"
+        title: 'Authentication required',
+        description: 'Please log in to submit a booking request',
+        variant: 'destructive',
       });
       return;
     }
     
+    // Validate form
+    if (!formData.roomId || !formData.purpose || !formData.society || !formData.date || !formData.startTime || !formData.endTime) {
+      toast({
+        title: 'Missing information',
+        description: 'Please fill in all required fields',
+        variant: 'destructive',
+      });
+      return;
+    }
+    
+    setSubmitting(true);
+    
     try {
-      setLoading(true);
-      
-      // Find classroom name
-      const classroom = classrooms.find(room => room.id === formData.roomId);
-      const roomName = classroom ? classroom.name '';
-      
-      // Create new booking
       const { data, error } = await supabase
         .from('room_bookings')
         .insert([
           {
-            room_id.roomId,
-            room_name,
-            purpose.purpose,
-            society.society,
-            date.date,
-            start_time.startTime,
-            end_time.endTime,
-            status'pending',
-            user_id?.id
+            roomId: formData.roomId,
+            purpose: formData.purpose,
+            society: formData.society,
+            date: formData.date,
+            startTime: formData.startTime,
+            endTime: formData.endTime,
+            userId: user.id,
+            status: 'pending'
           }
         ])
         .select();
       
       if (error) {
-        console.error('Error creating booking:', error);
         toast({
-          title: "Error",
-          description: "Failed to create booking" + error.message,
-          variant: "destructive"
+          title: 'Error submitting booking',
+          description: error.message,
+          variant: 'destructive',
         });
         return;
       }
       
-      // Add new booking to state with proper mapping
-      if (data) {
-        const newBooking = {
-          id[0].id,
-          roomId[0].room_id || '',
-          roomName[0].room_name,
-          purpose[0].purpose,
-          society[0].society,
-          date[0].date,
-          startTime[0].start_time,
-          endTime[0].end_time,
-          status[0].status as 'pending' | 'approved' | 'rejected',
-          userId[0].user_id,
-          createdAt[0].created_at
-        };
-        setBookings([...bookings, newBooking]);
-      }
+      toast({
+        title: 'Booking submitted',
+        description: 'Your room booking request has been submitted for approval',
+      });
       
       // Reset form
       setFormData({
-        roomId'',
-        purpose'',
-        society'',
-        date'',
-        startTime'',
-        endTime'',
+        roomId: '',
+        purpose: '',
+        society: '',
+        date: '',
+        startTime: '',
+        endTime: '',
       });
       
-      toast({
-        title: "Booking Request Submitted",
-        description: "Your room booking request has been submitted and is pending approval.",
-      });
+      // Refresh bookings
+      const { data: updatedBookings, error: fetchError } = await supabase
+        .from('room_bookings')
+        .select('*, rooms:roomId(name)')
+        .eq('userId', user.id)
+        .order('created_at', { ascending: false });
+      
+      if (!fetchError) {
+        const formattedBookings = updatedBookings.map(booking => ({
+          ...booking,
+          roomName: booking.rooms?.name || 'Unknown Room'
+        }));
+        
+        setBookings(formattedBookings);
+      }
     } catch (error) {
-      console.error('Unexpected error:', error);
       toast({
-        title: "Error",
-        description: "An unexpected error occurred.",
-        variant: "destructive"
+        title: 'Unexpected error',
+        description: 'Failed to submit booking request',
+        variant: 'destructive',
       });
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   };
   
-  // Get status badge component
   const getStatusBadge = (status) => {
-    switch (status) {
-      case 'approved':
-        return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-            <Check className="mr-1 h-3 w-3" /> Approved
-          </span>
-        );
-      case 'rejected':
-        return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-            <X className="mr-1 h-3 w-3" /> Rejected
-          </span>
-        );
-      default:
-        return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-            <Clock className="mr-1 h-3 w-3" /> Pending
-          </span>
-        );
+    if (status === 'approved') {
+      return <div className="px-2 py-1 rounded-full bg-green-100 text-green-800 text-xs font-medium">Approved</div>;
+    } else if (status === 'rejected') {
+      return <div className="px-2 py-1 rounded-full bg-red-100 text-red-800 text-xs font-medium">Rejected</div>;
+    } else {
+      return <div className="px-2 py-1 rounded-full bg-yellow-100 text-yellow-800 text-xs font-medium">Pending</div>;
     }
   };
 
@@ -240,56 +215,56 @@ const RoomBookings = () => {
         </TabsList>
         
         <TabsContent value="my-bookings">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {loading ? (
-              <div className="col-span-2 flex justify-center py-12">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+              <div className="col-span-2 flex justify-center items-center h-64">
+                <p>Loading your bookings...</p>
               </div>
-            ) .length > 0 ? (
+            ) : bookings.length > 0 ? (
               bookings.map(booking => (
                 <Card key={booking.id}>
-                  
+                  <CardHeader>
                     <div className="flex justify-between items-start">
-                      
-                        {booking.purpose}</CardTitle>
-                        {booking.society}</CardDescription>
+                      <div>
+                        <CardTitle>{booking.purpose}</CardTitle>
+                        <CardDescription>{booking.society}</CardDescription>
                       </div>
                       {getStatusBadge(booking.status)}
                     </div>
                   </CardHeader>
-                  
+                  <CardContent>
                     <div className="space-y-4">
-                      
+                      <div>
                         <h3 className="text-sm font-medium text-gray-500">Room</h3>
-                        {booking.roomName}</p>
+                        <p>{booking.roomName}</p>
                       </div>
                       
-                      
+                      <div>
                         <h3 className="text-sm font-medium text-gray-500">Date & Time</h3>
-                        {new Date(booking.date).toLocaleDateString('en-US', { weekday'long', year'numeric', month'long', day'numeric' })}</p>
-                        {booking.startTime} - {booking.endTime}</p>
+                        <p>{new Date(booking.date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                        <p>{booking.startTime} - {booking.endTime}</p>
                       </div>
                     </div>
                   </CardContent>
-                  
+                  <CardFooter>
                     <div className="w-full text-sm text-gray-500">
                       {booking.status === 'pending' ? (
                         'Your booking request is pending approval from the administration.'
-                      ) .status === 'approved' ? (
+                      ) : booking.status === 'approved' ? (
                         'Your booking has been approved. Please ensure to follow all guidelines.'
-                      ) (
+                      ) : (
                         'Your booking request has been rejected. Contact administration for more details.'
                       )}
                     </div>
                   </CardFooter>
                 </Card>
               ))
-            ) (
+            ) : (
               <div className="col-span-2 text-center py-12">
                 <h3 className="text-xl font-medium mb-2">No Bookings Found</h3>
-                <p className="text-gray-500">You haven't made unknown room booking requests yet.</p>
-                <Button className="mt-4" onClick={switchToNewBookingTab}>
-                  Make a Booking
+                <p className="text-gray-500 mb-6">You haven't made any room booking requests yet.</p>
+                <Button variant="outline" onClick={() => document.querySelector('[value="new-booking"]').click()}>
+                  Make Your First Booking
                 </Button>
               </div>
             )}
@@ -297,17 +272,17 @@ const RoomBookings = () => {
         </TabsContent>
         
         <TabsContent value="new-booking">
-          
-            
-              New Room Booking Request</CardTitle>
-              
+          <Card>
+            <CardHeader>
+              <CardTitle>New Room Booking Request</CardTitle>
+              <CardDescription>
                 Fill in the details to request a room for your society event or meeting
               </CardDescription>
             </CardHeader>
-            
+            <CardContent>
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  
+                  <div>
                     <Label htmlFor="society" className="mb-1 block">Society Name</Label>
                     <Input
                       id="society"
@@ -318,23 +293,23 @@ const RoomBookings = () => {
                     />
                   </div>
                   
-                  
+                  <div>
                     <Label htmlFor="roomId" className="mb-1 block">Room</Label>
-                    <Select name="roomId" value={formData.roomId} onValueChange={(value) => setFormData(prev => ({ ...prev, roomId }))}>
+                    <Select name="roomId" value={formData.roomId} onValueChange={(value) => setFormData(prev => ({ ...prev, roomId: value }))}>
                       <SelectTrigger id="roomId">
                         <SelectValue placeholder="Select a room" />
                       </SelectTrigger>
-                      
+                      <SelectContent>
                         {classrooms.map(room => (
                           <SelectItem key={room.id} value={room.id}>
-                            {room.name} ({room.building}, Capacity{room.capacity})
+                            {room.name} ({room.building}, Capacity: {room.capacity})
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
                   </div>
                   
-                  
+                  <div>
                     <Label htmlFor="date" className="mb-1 block">Date</Label>
                     <Input
                       id="date"
@@ -346,7 +321,7 @@ const RoomBookings = () => {
                   </div>
                   
                   <div className="grid grid-cols-2 gap-4">
-                    
+                    <div>
                       <Label htmlFor="startTime" className="mb-1 block">Start Time</Label>
                       <Input
                         id="startTime"
@@ -356,8 +331,7 @@ const RoomBookings = () => {
                         onChange={handleInputChange}
                       />
                     </div>
-                    
-                    
+                    <div>
                       <Label htmlFor="endTime" className="mb-1 block">End Time</Label>
                       <Input
                         id="endTime"
@@ -370,46 +344,41 @@ const RoomBookings = () => {
                   </div>
                 </div>
                 
-                
-                  <Label htmlFor="purpose" className="mb-1 block">Purpose of Booking</Label>
+                <div>
+                  <Label htmlFor="purpose" className="mb-1 block">Purpose</Label>
                   <Textarea
                     id="purpose"
                     name="purpose"
-                    placeholder="Provide details about the event or meeting..."
-                    rows={4}
+                    placeholder="Describe the purpose of your booking"
                     value={formData.purpose}
                     onChange={handleInputChange}
+                    className="min-h-[100px]"
                   />
                 </div>
                 
                 <div className="flex justify-end">
-                  <Button type="submit" disabled={loading}>
-                    {loading ? 'Submitting...' 'Submit Booking Request'}
+                  <Button type="submit" disabled={submitting}>
+                    {submitting ? 'Submitting...' : 'Submit Booking Request'}
                   </Button>
                 </div>
               </form>
             </CardContent>
+            <CardFooter className="flex-col items-start">
+              <h3 className="text-sm font-semibold mb-2">Booking Guidelines:</h3>
+              <ul className="text-sm text-gray-500 space-y-1 list-disc pl-5">
+                <li>Bookings must be made at least 3 days in advance.</li>
+                <li>All society bookings require approval from the administration.</li>
+                <li>The society is responsible for keeping the room clean and orderly.</li>
+                <li>Any damage to property will be the responsibility of the society.</li>
+                <li>Booking duration should not exceed 4 hours.</li>
+                <li>Rooms must be vacated on time for subsequent bookings.</li>
+                <li>Food and drinks are not allowed in classrooms and labs.</li>
+                <li>For technical equipment, please specify in the purpose field.</li>
+              </ul>
+            </CardFooter>
           </Card>
         </TabsContent>
       </Tabs>
-      
-      <Card className="mt-8">
-        
-          Room Booking Guidelines</CardTitle>
-        </CardHeader>
-        
-          <ul className="list-disc pl-5 space-y-2">
-            Bookings must be made at least 3 days in advance.</li>
-            All society bookings require approval from the administration.</li>
-            The society is responsible for keeping the room clean and orderly.</li>
-            Any damage to property will be the responsibility of the society.</li>
-            Booking duration should not exceed 4 hours.</li>
-            Rooms must be vacated on time for subsequent bookings.</li>
-            Food and drinks are not allowed in classrooms and labs.</li>
-            For technical equipment, please specify in the purpose field.</li>
-          </ul>
-        </CardContent>
-      </Card>
     </div>
   );
 };

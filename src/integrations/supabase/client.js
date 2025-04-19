@@ -13,13 +13,13 @@ export const supabase = createClient(
   SUPABASE_URL, 
   SUPABASE_PUBLISHABLE_KEY,
   {
-    auth{
-      persistSession,
-      autoRefreshToken,
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true
     },
-    global{
-      headers{
-        'Content-Type''application/json',
+    global: {
+      headers: {
+        'Content-Type': 'application/json'
       },
     },
   }

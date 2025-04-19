@@ -5,7 +5,8 @@ import SocietyFactoryArtifact from '../artifacts/contracts/SocietyFactory.sol/So
 const SOCIETY_FACTORY_ADDRESS = import.meta.env.VITE_SOCIETY_FACTORY_ADDRESS || '';
 
 // Types from the contract
-export interface Society {
+// TypeScript interfaces removed for JavaScript conversion
+
   name;
   description: ;
   imageURI;
@@ -14,7 +15,8 @@ export interface Society {
   isActive;
 }
 
-export interface Event {
+// TypeScript interfaces removed for JavaScript conversion
+
   societyId;
   name;
   description: ;
@@ -25,13 +27,14 @@ export interface Event {
   isActive;
 }
 
-export interface Participant {
+// TypeScript interfaces removed for JavaScript conversion
+
   userAddress;
   joinedAt;
 }
 
 class ContractService {
-  private contract = null;
+  contract = null;
   
   constructor() {
     this.initializeContract = this.initializeContract.bind(this);
@@ -52,10 +55,10 @@ class ContractService {
   }
   
   // Society functions
-  async createSociety(name, description: , imageURI) {
+  async createSociety(name, description) {
     if (!this.contract) throw new Error('Contract not initialized');
     
-    const tx = await this.contract.createSociety(name, description: , imageURI);
+    const tx = await this.contract.createSociety(name, description);
     const receipt = await tx.wait();
     
     // Find the SocietyCreated event in the receipt
@@ -72,10 +75,10 @@ class ContractService {
     return event ? event.args.societyId ;
   }
   
-  async updateSociety(societyId, name, description: , imageURI) {
+  async updateSociety(societyId, name, description) {
     if (!this.contract) throw new Error('Contract not initialized');
     
-    const tx = await this.contract.updateSociety(societyId, name, description: , imageURI);
+    const tx = await this.contract.updateSociety(societyId, name, description);
     await tx.wait();
     return true;
   }
@@ -92,21 +95,13 @@ class ContractService {
   async createEvent(
     societyId,
     name,
-    description: ,
-    imageURI,
-    startTime,
-    endTime
-  ) {
+    description) {
     if (!this.contract) throw new Error('Contract not initialized');
     
     const tx = await this.contract.createEvent(
       societyId,
       name,
-      description: ,
-      imageURI,
-      startTime,
-      endTime
-    );
+      description);
     const receipt = await tx.wait();
     
     // Find the EventCreated event in the receipt
@@ -127,22 +122,14 @@ class ContractService {
     societyId,
     eventId,
     name,
-    description: ,
-    imageURI,
-    startTime,
-    endTime
-  ) {
+    description) {
     if (!this.contract) throw new Error('Contract not initialized');
     
     const tx = await this.contract.updateEvent(
       societyId,
       eventId,
       name,
-      description: ,
-      imageURI,
-      startTime,
-      endTime
-    );
+      description);
     await tx.wait();
     return true;
   }
@@ -171,9 +158,7 @@ class ContractService {
     const societies = await this.contract.getAllSocieties();
     return societies.map((society) => ({
       name.name,
-      description: .description: ,
-      imageURI.imageURI,
-      creator.creator,
+      description: .description,
       createdAt(society.createdAt),
       isActive.isActive
     }));
@@ -186,8 +171,7 @@ class ContractService {
     return events.map((event) => ({
       societyId(event.societyId),
       name.name,
-      description: .description: ,
-      imageURI.imageURI,
+      description: .description,
       startTime(event.startTime),
       endTime(event.endTime),
       createdAt(event.createdAt),

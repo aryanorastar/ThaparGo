@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../components/ui/card';
@@ -30,7 +29,7 @@ const Auth = () => {
     return email.toLowerCase().endsWith('@thapar.edu');
   };
 
-  const handleSignUp = async (e.FormEvent) => {
+  const handleSignUp = async (e) => {
     e.preventDefault();
     
     // Validate if the email belongs to Thapar domain
@@ -49,27 +48,30 @@ const Auth = () => {
       const { error } = await supabase.auth.signUp({
         email,
         password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+        },
       });
-      
+
       if (error) {
         toast({
-          title: 'Error',
-          description: .message,
+          title: 'Registration Failed',
+          description: error.message,
           variant: 'destructive',
         });
       } else {
         toast({
-          title: 'Success',
-          description: 'Registration successful! Please check your email for verification.',
+          title: 'Registration Successful',
+          description: 'Please check your email for a confirmation link.',
         });
-        // Navigate to home page - the auth state listener will handle the session
-        navigate('/');
+        // Clear form
+        setEmail('');
+        setPassword('');
       }
     } catch (error) {
-      console.error('Error during sign up:', error);
       toast({
-        title: 'Error',
-        description: 'An unexpected error occurred during registration.',
+        title: 'Unexpected Error',
+        description: 'An unexpected error occurred. Please try again.',
         variant: 'destructive',
       });
     } finally {
@@ -77,7 +79,7 @@ const Auth = () => {
     }
   };
 
-  const handleSignIn = async (e.FormEvent) => {
+  const handleSignIn = async (e) => {
     e.preventDefault();
     
     // For sign in, we still verify the email format to ensure consistency
@@ -97,25 +99,24 @@ const Auth = () => {
         email,
         password,
       });
-      
+
       if (error) {
         toast({
-          title: 'Error',
-          description: .message,
+          title: 'Sign In Failed',
+          description: error.message,
           variant: 'destructive',
         });
       } else {
         toast({
-          title: 'Success',
-          description: 'Logged in successfully!',
+          title: 'Welcome Back',
+          description: 'You have successfully signed in.',
         });
         navigate('/');
       }
     } catch (error) {
-      console.error('Error during sign in:', error);
       toast({
-        title: 'Error',
-        description: 'An unexpected error occurred during login.',
+        title: 'Unexpected Error',
+        description: 'An unexpected error occurred. Please try again.',
         variant: 'destructive',
       });
     } finally {
@@ -134,47 +135,43 @@ const Auth = () => {
           
           <TabsContent value="signin">
             <form onSubmit={handleSignIn}>
-              
-                Sign In</CardTitle>
-                <CardDescription className="flex items-center space-x-2">
-                  <Info size={16} className="text-blue-500" />
-                  Only @thapar.edu emails are allowed</span>
+              <CardHeader>
+                <CardTitle>Sign In</CardTitle>
+                <CardDescription>
+                  Enter your Thapar email and password to access your account.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="signin-email">Email</Label>
-                  <Input 
+                  <Input
                     id="signin-email"
                     type="email"
+                    placeholder="your.name@thapar.edu"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="your.email@thapar.edu"
-                    disabled={loading}
                     required
                   />
                 </div>
-                
                 <div className="space-y-2">
                   <Label htmlFor="signin-password">Password</Label>
-                  <Input 
+                  <Input
                     id="signin-password"
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    disabled={loading}
                     required
                   />
                 </div>
               </CardContent>
-              
+              <CardFooter>
                 <Button type="submit" className="w-full" disabled={loading}>
                   {loading ? (
-                    
+                    <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Signing in...
+                      Signing In...
                     </>
-                  ) (
+                  ) : (
                     'Sign In'
                   )}
                 </Button>
@@ -184,50 +181,50 @@ const Auth = () => {
           
           <TabsContent value="signup">
             <form onSubmit={handleSignUp}>
-              
-                Sign Up</CardTitle>
-                <CardDescription className="flex items-center space-x-2">
-                  <Info size={16} className="text-blue-500" />
-                  Only @thapar.edu emails are allowed</span>
+              <CardHeader>
+                <CardTitle>Sign Up</CardTitle>
+                <CardDescription>
+                  Create a new account using your Thapar email address.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="signup-email">Email</Label>
-                  <Input 
+                  <Input
                     id="signup-email"
                     type="email"
+                    placeholder="your.name@thapar.edu"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="your.email@thapar.edu"
-                    disabled={loading}
                     required
                   />
+                  <p className="text-xs text-gray-500 flex items-center">
+                    <Info className="h-3 w-3 mr-1" />
+                    Only @thapar.edu email addresses are allowed.
+                  </p>
                 </div>
-                
                 <div className="space-y-2">
                   <Label htmlFor="signup-password">Password</Label>
-                  <Input 
+                  <Input
                     id="signup-password"
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    disabled={loading}
                     required
                   />
                   <p className="text-xs text-gray-500">
-                    Password must be at least 6 characters long
+                    Password must be at least 6 characters long.
                   </p>
                 </div>
               </CardContent>
-              
+              <CardFooter>
                 <Button type="submit" className="w-full" disabled={loading}>
                   {loading ? (
-                    
+                    <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Creating account...
+                      Creating Account...
                     </>
-                  ) (
+                  ) : (
                     'Sign Up'
                   )}
                 </Button>

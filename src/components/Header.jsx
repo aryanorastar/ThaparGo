@@ -16,12 +16,12 @@ const Header = () => {
   };
 
   const navItems = [
-    { path'/', label'Home' },
-    { path'/map', label'Campus Map' },
-    { path'/timetable', label'Timetable' },
-    { path'/classrooms', label'Classrooms' },
-    { path'/bookings', label'Room Bookings' },
-    { path'/societies-hub', label'Societies Hub' },
+    { path: '/', label: 'Home' },
+    { path: '/map', label: 'Campus Map' },
+    { path: '/timetable', label: 'Timetable' },
+    { path: '/classrooms', label: 'Classrooms' },
+    { path: '/bookings', label: 'Room Bookings' },
+    { path: '/societies-hub', label: 'Societies Hub' },
   ];
 
   return (
@@ -29,8 +29,8 @@ const Header = () => {
       <div className="container mx-auto px-4 py-3 flex items-center justify-between">
         <Link to="/" className="flex items-center space-x-2">
           <motion.span 
-            initial={{ opacity0, x-10 }}
-            animate={{ opacity1, x0 }}
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
             className="font-bold text-xl md:text-2xl"
           >
             Thapar Go
@@ -38,23 +38,22 @@ const Header = () => {
         </Link>
 
         {isMobile ? (
-          
-            <Button variant: ="ghost" size="icon" onClick={toggleMenu} className="text-white">
-              {isMenuOpen ? <X size={24} /> <Menu size={24} />}
+          <>
+            <Button variant="ghost" size="icon" onClick={toggleMenu} className="text-white">
+              {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </Button>
-            
             {isMenuOpen && (
               <div className="fixed inset-0 bg-black bg-opacity-50 z-40" onClick={toggleMenu}>
                 <motion.div 
-                  initial={{ x300 }}
-                  animate={{ x0 }}
-                  exit={{ x300 }}
-                  transition={{ type"spring", stiffness300, damping30 }}
+                  initial={{ x: 300 }}
+                  animate={{ x: 0 }}
+                  exit={{ x: 300 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
                   className="absolute right-0 top-0 h-full w-64 bg-white text-thapar-dark z-50 p-4 shadow-lg"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <div className="flex justify-end mb-6">
-                    <Button variant: ="ghost" size="icon" onClick={toggleMenu}>
+                    <Button variant="ghost" size="icon" onClick={toggleMenu}>
                       <X size={24} />
                     </Button>
                   </div>
@@ -66,7 +65,7 @@ const Header = () => {
                         className={`px-4 py-2 rounded-md transition-colors duration-200 ${
                           location.pathname === item.path 
                             ? 'bg-thapar-maroon/10 text-thapar-maroon font-medium' 
-                            'hover:bg-gray-100'
+                            : 'hover:bg-gray-100'
                         }`}
                         onClick={toggleMenu}
                       >
@@ -78,7 +77,7 @@ const Header = () => {
               </div>
             )}
           </>
-        ) (
+        ) : (
           <nav className="flex space-x-6">
             {navItems.map((item) => (
               <Link 
@@ -89,7 +88,7 @@ const Header = () => {
                 <span className={`font-medium ${
                   location.pathname === item.path 
                     ? 'text-white' 
-                    'text-gray-200 hover:text-white transition-colors duration-200'
+                    : 'text-gray-200 hover:text-white transition-colors duration-200'
                 }`}>
                   {item.label}
                 </span>

@@ -4,102 +4,77 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '../components/ui/dialog';
-import { supabase } from '../integrations/supabase/client';
+import { Label } from '../components/ui/label';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../components/ui/dialog';
 import { useToast } from '../hooks/use-toast';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
+import { supabase } from '../integrations/supabase/client';
 import { useAuth } from '../providers/AuthProvider';
-// import { fetchSubjects } from '../hooks/useDatabaseSeed';
-// NOTE is now handled outside the production bundle. See scripts/useDatabaseSeed.ts if needed.
 
 const Timetable = () => {
-  const [selectedBatch, setSelectedBatch] = useState("");
-  const [batches, setBatches] = useState([]);
-  const [scheduleData, setScheduleData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [isEditing, setIsEditing] = useState(false);
-  const [editingDay, setEditingDay] = useState(null);
-  const [editingSlot, setEditingSlot] = useState(null);
-  const [editedSlot, setEditedSlot] = useState({});
-  const [isSlotDialogOpen, setIsSlotDialogOpen] = useState(false);
-  const [subjects, setSubjects] = useState([]);
-  const [branches, setBranches] = useState([]);
-  const [years, setYears] = useState([]);
-  const [selectedBranch, setSelectedBranch] = useState("");
-  const [selectedYear, setSelectedYear] = useState("");
   const { toast } = useToast();
   const { user } = useAuth();
-  
+  const [loading, setLoading] = useState(true);
+  const [branches, setBranches] = useState([]);
+  const [years, setYears] = useState([1, 2, 3, 4]);
+  const [batches, setBatches] = useState([]);
+  const [selectedBranch, setSelectedBranch] = useState('');
+  const [selectedYear, setSelectedYear] = useState('');
+  const [selectedBatch, setSelectedBatch] = useState('');
+  const [selectedBatchData, setSelectedBatchData] = useState(null);
+  const [scheduleData, setScheduleData] = useState([]);
+  const [isSlotDialogOpen, setIsSlotDialogOpen] = useState(false);
+  const [editingDay, setEditingDay] = useState(null);
+  const [editingSlot, setEditingSlot] = useState(null);
+  const [editedSlot, setEditedSlot] = useState({
+    subject: '',
+    teacher: '',
+    room: '',
+    type: 'class'
+  });
+
+  const weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
   useEffect(() => {
     const fetchBatches = async () => {
       try {
         const { data, error } = await supabase
           .from('batches')
-          .select('*');
+          .select('*')
+          .order('name');
         
         if (error) {
-          console.error('Error fetching batches:', error);
           toast({
-            title: 'Error',
-            description: 'Failed to load batches. Please try again later.',
+            title: 'Error fetching batches',
+            description: error.message,
             variant: 'destructive',
           });
           return;
         }
         
-        const batchData = data as BatchData[];
-        setBatches(batchData);
+        setBatches(data || []);
         
-        const uniqueBranches = Array.from(new Set(batchData.map(batch => batch.branch)));
-        const uniqueYears = Array.from(new Set(batchData.map(batch => batch.year))).sort();
-        
+        // Extract unique branches
+        const uniqueBranches = [...new Set(data.map(batch => batch.branch))];
         setBranches(uniqueBranches);
-        setYears(uniqueYears);
         
-        if (uniqueBranches.length > 0) {
-          setSelectedBranch(uniqueBranches[0]);
-        }
-        
-        if (uniqueYears.length > 0) {
-          setSelectedYear(uniqueYears[0].toString());
-        }
-        
-        if (batchData.length > 0) {
-          setSelectedBatch(batchData[0].id);
-        }
+        setLoading(false);
       } catch (error) {
-        console.error('Unexpected error:', error);
         toast({
-          title: 'Error',
-          description: 'An unexpected error occurred.',
+          title: 'Unexpected error',
+          description: 'Failed to load batches',
           variant: 'destructive',
         });
-      } finally {
         setLoading(false);
       }
     };
 
-    // const getSubjects = async () => {
-    //   // fetchSubjects is now handled outside production code
-    // };
-    const getSubjects = async () => { /* no-op in production */ };
-
+    const getSubjects = async () => {
+      // fetchSubjects is now handled outside production code
+    };
 
     fetchBatches();
     getSubjects();
   }, [toast]);
-
-  useEffect(() => {
-    if (selectedBranch && selectedYear) {
-      const filteredBatches = batches.filter(
-        batch => batch.branch === selectedBranch && batch.year === parseInt(selectedYear)
-      );
-      
-      if (filteredBatches.length > 0 && !filteredBatches.some(b => b.id === selectedBatch)) {
-        setSelectedBatch(filteredBatches[0].id);
-      }
-    }
-  }, [selectedBranch, selectedYear, batches, selectedBatch]);
 
   useEffect(() => {
     const fetchSchedules = async () => {
@@ -107,118 +82,111 @@ const Timetable = () => {
       
       try {
         setLoading(true);
-        const { data, error } = await supabase
+        
+        // Get batch details
+        const { data: batchData, error: batchError } = await supabase
+          .from('batches')
+          .select('*')
+          .eq('id', selectedBatch)
+          .single();
+        
+        if (batchError) {
+          toast({
+            title: 'Error fetching batch details',
+            description: batchError.message,
+            variant: 'destructive',
+          });
+          setLoading(false);
+          return;
+        }
+        
+        setSelectedBatchData(batchData);
+        
+        // Get schedule for this batch
+        const { data: scheduleData, error: scheduleError } = await supabase
           .from('schedules')
           .select('*')
           .eq('batch_id', selectedBatch);
         
-        if (error) {
-          console.error('Error fetching schedules:', error);
+        if (scheduleError) {
           toast({
-            title: 'Error',
-            description: 'Failed to load schedules. Please try again later.',
+            title: 'Error fetching schedule',
+            description: scheduleError.message,
             variant: 'destructive',
           });
+          setLoading(false);
           return;
         }
         
-        const weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
-        let schedules = [];
-        
-        if (data && data.length > 0) {
-          schedules = data.map(item => {
-            let parsedSlots;
-            if (typeof item.slots === 'string') {
-              try {
-                parsedSlots = JSON.parse(item.slots);
-              } catch (e) {
-                console.error('Error parsing slots:', e);
-                parsedSlots = [];
-              }
-            } else {
-              parsedSlots = item.slots as unknown as TimeSlot[];
-            }
-            
-            return {
-              id.id,
-              day.day,
-              slots,
-              batch_id.batch_id
-            };
-          });
-        }
+        // Create a schedule for each weekday if it doesn't exist
+        const schedules = scheduleData || [];
+        const batch_id = selectedBatch;
         
         weekdays.forEach(day => {
           if (!schedules.find(s => s.day === day)) {
             schedules.push({
-              id`temp-${day}`,
+              id: `temp-${day}`,
               day,
-              slots(),
+              slots: [],
               batch_id
             });
           }
         });
         
-        schedules.sort((a, b) => {
-          const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
-          return days.indexOf(a.day) - days.indexOf(b.day);
-        });
-        
         setScheduleData(schedules);
       } catch (error) {
-        console.error('Unexpected error:', error);
         toast({
-          title: 'Error',
-          description: 'An unexpected error occurred.',
+          title: 'Unexpected error',
+          description: 'Failed to load schedule',
           variant: 'destructive',
         });
       } finally {
         setLoading(false);
       }
     };
-
+    
     fetchSchedules();
   }, [selectedBatch, toast]);
   
   const handleBatchChange = (value) => {
     setSelectedBatch(value);
   };
-
+  
   const handleBranchChange = (value) => {
     setSelectedBranch(value);
   };
-
+  
   const handleYearChange = (value) => {
     setSelectedYear(value);
   };
-
+  
   const generateDefaultTimeSlots = () => {
-    return Array.from({ length8 }).map((_, i) => {
+    return Array.from({ length: 8 }).map((_, i) => {
       const startHour = 8 + i;
       const endHour = 9 + i;
       
       return {
-        id`slot-${i}`,
-        startTime`${startHour.toString().padStart(2, '0')}:00`,
-        endTime`${endHour.toString().padStart(2, '0')}:00`,
-        subject'Free Period',
-        type'free',
+        id: `slot-${i}`,
+        startTime: `${startHour.toString().padStart(2, '0')}:00`,
+        endTime: `${endHour.toString().padStart(2, '0')}:00`,
+        subject: 'Free Period',
+        type: 'free',
       };
     });
   };
-
+  
   const handleEditSlot = (day, slot) => {
     setEditingDay(day);
     setEditingSlot(slot);
     setEditedSlot({
-      subject.subject,
-      teacher.teacher,
-      room.room,
-      type.type,
+      subject: slot.subject,
+      teacher: slot.teacher,
+      room: slot.room,
+      type: slot.type,
     });
     setIsSlotDialogOpen(true);
   };
-
+  
   const handleSaveSlot = async () => {
     if (!editingDay || !editingSlot || !selectedBatch) return;
     
@@ -229,35 +197,31 @@ const Timetable = () => {
             return {
               ...slot,
               ...editedSlot,
-              type.subject === 'Free Period' ? 'free' (editedSlot.type || 'class')
+              type: editedSlot.subject === 'Free Period' ? 'free' : (editedSlot.type || 'class')
             };
           }
           return slot;
         });
         
-        return {
-          ...schedule,
-          slots
-        };
+        return { ...schedule, slots: updatedSlots };
       }
       return schedule;
     });
     
     setScheduleData(updatedScheduleData);
-    setIsSlotDialogOpen(false);
+    
+    // Find the schedule to update
+    const scheduleToUpdate = updatedScheduleData.find(s => s.day === editingDay);
     
     try {
-      const scheduleToUpdate = updatedScheduleData.find(s => s.day === editingDay);
-      
-      if (!scheduleToUpdate) return;
-      
+      // If it's a temporary ID, create a new schedule
       if (scheduleToUpdate.id.startsWith('temp-')) {
         const { data, error } = await supabase
           .from('schedules')
           .insert({
-            day.day,
-            batch_id,
-            slots.slots as unknown as Json
+            day: day,
+            batch_id: batch_id,
+            slots: slots
           })
           .select();
         
@@ -265,7 +229,7 @@ const Timetable = () => {
           console.error('Error creating schedule:', error);
           toast({
             title: 'Error',
-            description: 'Failed to save schedule. Please try again.',
+            description: 'Failed to create schedule. Please try again.',
             variant: 'destructive',
           });
           return;
@@ -273,14 +237,14 @@ const Timetable = () => {
         
         if (data && data.length > 0) {
           setScheduleData(prev => prev.map(s => 
-            s.day === scheduleToUpdate.day ? { ...s, id[0].id } 
+            s.day === scheduleToUpdate.day ? { ...s, id: data[0].id } : s
           ));
         }
       } else {
         const { error } = await supabase
           .from('schedules')
           .update({
-            slots.slots as unknown as Json
+            slots: scheduleToUpdate.slots
           })
           .eq('id', scheduleToUpdate.id);
         
@@ -291,65 +255,19 @@ const Timetable = () => {
             description: 'Failed to update schedule. Please try again.',
             variant: 'destructive',
           });
-          return;
         }
       }
-      
-      toast({
-        title: 'Success',
-        description: 'Timetable updated successfully!',
-      });
     } catch (error) {
-      console.error('Error saving slot:', error);
+      console.error('Unexpected error:', error);
       toast({
         title: 'Error',
-        description: 'An unexpected error occurred while saving.',
+        description: 'An unexpected error occurred. Please try again.',
         variant: 'destructive',
       });
     }
+    
+    setIsSlotDialogOpen(false);
   };
-
-  const renderTimeSlots = (day, slots) => {
-    return slots.map((slot) => (
-      <div 
-        key={slot.id} 
-        className={`
-          p-3 rounded-md mb-2 transition-all duration-300
-          ${slot.type === 'class' ? 'bg-blue-50 border-l-4 border-blue-500 hover:bg-blue-100' 
-            slot.type === 'lab' ? 'bg-green-50 border-l-4 border-green-500 hover:bg-green-100' 
-            'bg-gray-50 border-l-4 border-gray-300 hover:bg-gray-100'}
-          ${user ? 'cursor-pointer' ''}
-        `}
-        onClick={() => user && handleEditSlot(day, slot)}
-      >
-        <div className="font-medium">{slot.subject}</div>
-        {slot.type !== 'free' && (
-          
-            <div className="text-sm text-gray-600">
-              {slot.startTime} - {slot.endTime}
-            </div>
-            {slot.teacher && (
-              <div className="text-sm text-gray-600">
-                {slot.teacher}
-              </div>
-            )}
-            {slot.room && (
-              <div className="text-sm text-gray-600">
-                Room{slot.room}
-              </div>
-            )}
-          </>
-        )}
-        {user && (
-          <div className="mt-1 text-xs text-blue-500">
-            Click to edit
-          </div>
-        )}
-      </div>
-    ));
-  };
-
-  const selectedBatchData = batches.find(batch => batch.id === selectedBatch);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -357,267 +275,312 @@ const Timetable = () => {
       <p className="text-lg mb-8">View class schedules for different batches and courses.</p>
       
       {loading && !selectedBatchData ? (
-        <div className="flex justify-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+        <div className="flex justify-center items-center h-64">
+          <p>Loading...</p>
         </div>
-      ) (
-        
+      ) : (
+        <>
           <Card className="mb-6">
-            
-              Select Batch</CardTitle>
-              Choose the branch, year and batch to view its timetable</CardDescription>
+            <CardHeader>
+              <CardTitle>Select Batch</CardTitle>
+              <CardDescription>Choose the branch, year and batch to view its timetable</CardDescription>
             </CardHeader>
-            
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                
-                  <label className="block text-sm font-medium mb-1">Branch</label>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                  <Label htmlFor="branch" className="mb-1 block">Branch</Label>
                   <Select value={selectedBranch} onValueChange={handleBranchChange}>
-                    
+                    <SelectTrigger id="branch">
                       <SelectValue placeholder="Select branch" />
                     </SelectTrigger>
-                    
-                      {branches.map((branch) => (
-                        <SelectItem key={branch} value={branch}>{branch}</SelectItem>
+                    <SelectContent>
+                      {branches.map(branch => (
+                        <SelectItem key={branch} value={branch}>
+                          {branch}
+                        </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
                 
-                
-                  <label className="block text-sm font-medium mb-1">Year</label>
+                <div>
+                  <Label htmlFor="year" className="mb-1 block">Year</Label>
                   <Select value={selectedYear} onValueChange={handleYearChange}>
-                    
+                    <SelectTrigger id="year">
                       <SelectValue placeholder="Select year" />
                     </SelectTrigger>
-                    
-                      {years.map((year) => (
-                        <SelectItem key={year} value={year.toString()}>{year}</SelectItem>
+                    <SelectContent>
+                      {years.map(year => (
+                        <SelectItem key={year} value={year.toString()}>
+                          {year}
+                        </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
                 
-                
-                  <label className="block text-sm font-medium mb-1">Batch</label>
-                  <Select 
-                    value={selectedBatch} 
-                    onValueChange={handleBatchChange}
-                    disabled={batches.filter(b => 
-                      b.branch === selectedBranch && 
-                      b.year === parseInt(selectedYear || '0')
-                    ).length === 0}
-                  >
-                    
+                <div>
+                  <Label htmlFor="batch" className="mb-1 block">Batch</Label>
+                  <Select value={selectedBatch} onValueChange={handleBatchChange}>
+                    <SelectTrigger id="batch">
                       <SelectValue placeholder="Select batch" />
                     </SelectTrigger>
-                    
+                    <SelectContent>
                       {batches
                         .filter(batch => 
-                          batch.branch === selectedBranch && 
-                          batch.year === parseInt(selectedYear || '0')
+                          (!selectedBranch || batch.branch === selectedBranch) && 
+                          (!selectedYear || batch.year.toString() === selectedYear)
                         )
-                        .map((batch) => (
+                        .map(batch => (
                           <SelectItem key={batch.id} value={batch.id}>
-                            {batch.name} - Section {batch.section}
+                            {batch.name}
                           </SelectItem>
-                        ))
-                      }
+                        ))}
                     </SelectContent>
                   </Select>
                 </div>
               </div>
-              
-              {selectedBatchData && (
-                <div className="mt-4">
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <h3 className="font-medium text-lg mb-2">
-                      {selectedBatchData.branch} - Year {selectedBatchData.year}
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                      
-                        <span className="font-medium">Batch:</span> {selectedBatchData.name}
-                      </div>
-                      
-                        <span className="font-medium">Section:</span> {selectedBatchData.section}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
             </CardContent>
           </Card>
           
           {selectedBatchData && (
-            
+            <Tabs defaultValue="grid">
+              <TabsList className="mb-6">
+                <TabsTrigger value="grid">Grid View</TabsTrigger>
+                <TabsTrigger value="list">List View</TabsTrigger>
+              </TabsList>
               
-                Weekly Schedule</CardTitle>
-                
-                  Timetable for {selectedBatchData.branch} {selectedBatchData.year} Year - {selectedBatchData.name}
-                </CardDescription>
-              </CardHeader>
+              <TabsContent value="grid">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>{selectedBatchData.name} Timetable</CardTitle>
+                    <CardDescription>
+                      {selectedBatchData.branch}, Year {selectedBatchData.year}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
+                      {weekdays.map(day => (
+                        <div key={day} className="space-y-2">
+                          <h3 className="font-semibold text-center py-2 bg-gray-100 rounded-md">
+                            {day}
+                          </h3>
+                          
+                          {scheduleData
+                            .find(schedule => schedule.day === day)?.slots
+                            .sort((a, b) => a.startTime.localeCompare(b.startTime))
+                            .map(slot => (
+                              <div
+                                key={slot.id} 
+                                className={`
+                                  p-3 rounded-md mb-2 transition-all duration-300
+                                  ${slot.type === 'class' ? 'bg-blue-50 border-l-4 border-blue-500 hover:bg-blue-100' : 
+                                    slot.type === 'lab' ? 'bg-green-50 border-l-4 border-green-500 hover:bg-green-100' : 
+                                    'bg-gray-50 border-l-4 border-gray-300 hover:bg-gray-100'}
+                                  ${user ? 'cursor-pointer' : ''}
+                                `}
+                                onClick={() => user && handleEditSlot(day, slot)}
+                              >
+                                <div className="font-medium">{slot.subject}</div>
+                                {slot.type !== 'free' && (
+                                  <>
+                                    {slot.teacher && (
+                                      <div className="text-xs text-gray-500">
+                                        {slot.teacher}
+                                      </div>
+                                    )}
+                                    {slot.room && (
+                                      <div className="text-xs text-gray-500">
+                                        Room: {slot.room}
+                                      </div>
+                                    )}
+                                  </>
+                                )}
+                                <div className="text-xs mt-1">
+                                  {slot.startTime} - {slot.endTime}
+                                </div>
+                              </div>
+                            ))}
+                          
+                          {(!scheduleData.find(schedule => schedule.day === day)?.slots?.length) && (
+                            <div className="text-center p-4 text-gray-500 text-sm">
+                              No classes scheduled
+                            </div>
+                          )}
+                          
+                          {user && (
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              className="w-full mt-2"
+                              onClick={() => {
+                                const newSlot = {
+                                  id: `new-${Date.now()}`,
+                                  startTime: '09:00',
+                                  endTime: '10:00',
+                                  subject: 'New Class',
+                                  teacher: '',
+                                  room: '',
+                                  type: 'class'
+                                };
+                                
+                                setEditingDay(day);
+                                setEditingSlot(newSlot);
+                                setEditedSlot({
+                                  subject: newSlot.subject,
+                                  teacher: newSlot.teacher,
+                                  room: newSlot.room,
+                                  type: newSlot.type
+                                });
+                                
+                                // Add the new slot to the schedule
+                                setScheduleData(prev => prev.map(schedule => {
+                                  if (schedule.day === day) {
+                                    return {
+                                      ...schedule,
+                                      slots: [...(schedule.slots || []), newSlot]
+                                    };
+                                  }
+                                  return schedule;
+                                }));
+                                
+                                setIsSlotDialogOpen(true);
+                              }}
+                            >
+                              Add Slot
+                            </Button>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
               
-                {loading ? (
-                  <div className="flex justify-center py-8">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-                  </div>
-                ) (
-                  <Tabs defaultValue="grid-view">
-                    <TabsList className="mb-4">
-                      <TabsTrigger value="grid-view">Grid View</TabsTrigger>
-                      <TabsTrigger value="day-view">Day View</TabsTrigger>
-                    </TabsList>
-                    
-                    <TabsContent value="grid-view">
-                      <div className="overflow-x-auto">
-                        
+              <TabsContent value="list">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>{selectedBatchData.name} Timetable</CardTitle>
+                    <CardDescription>
+                      {selectedBatchData.branch}, Year {selectedBatchData.year}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    {weekdays.map(day => (
+                      <div key={day} className="mb-6">
+                        <h3 className="font-semibold text-lg mb-3">{day}</h3>
+                        <div className="space-y-2">
+                          {scheduleData
+                            .find(schedule => schedule.day === day)?.slots
+                            .sort((a, b) => a.startTime.localeCompare(b.startTime))
+                            .map(slot => (
+                              <div 
+                                key={slot.id}
+                                className={`
+                                  p-3 rounded-md border-l-4 flex justify-between items-center
+                                  ${slot.type === 'class' ? 'border-blue-500 bg-blue-50' : 
+                                    slot.type === 'lab' ? 'border-green-500 bg-green-50' : 
+                                    'border-gray-300 bg-gray-50'}
+                                  ${user ? 'cursor-pointer' : ''}
+                                `}
+                                onClick={() => user && handleEditSlot(day, slot)}
+                              >
+                                <div>
+                                  <div className="font-medium">{slot.subject}</div>
+                                  {slot.type !== 'free' && (
+                                    <div className="text-sm text-gray-500">
+                                      {slot.teacher} {slot.room && `| Room: ${slot.room}`}
+                                    </div>
+                                  )}
+                                </div>
+                                <div className="text-sm">
+                                  {slot.startTime} - {slot.endTime}
+                                </div>
+                              </div>
+                            ))}
                           
-                            
-                              Time</TableHead>
-                              Monday</TableHead>
-                              Tuesday</TableHead>
-                              Wednesday</TableHead>
-                              Thursday</TableHead>
-                              Friday</TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          
-                            {Array.from({ length8 }).map((_, slotIndex) => {
-                              const startHour = 8 + slotIndex;
-                              const endHour = 9 + slotIndex;
-                              const timeStr = `${startHour.toString().padStart(2, '0')}:00-${endHour.toString().padStart(2, '0')}:00`;
-                              
-                              return (
-                                <TableRow key={timeStr}>
-                                  <TableCell className="font-medium">{timeStr}</TableCell>
-                                  {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map(day => {
-                                    const daySchedule = scheduleData.find(schedule => schedule.day === day);
-                                    const slot = daySchedule?.slots[slotIndex];
-                                    
-                                    return (
-                                      <TableCell 
-                                        key={`${day}-${slotIndex}`}
-                                        className={`hover:bg-gray-50 ${user ? 'cursor-pointer' ''} ${
-                                          slot?.type === 'class' ? 'bg-blue-50' 
-                                          slot?.type === 'lab' ? 'bg-green-50' ''
-                                        }`}
-                                        onClick={() => user && slot && handleEditSlot(day, slot)}
-                                      >
-                                        {slot ? (
-                                          <div className="text-xs">
-                                            <div className="font-medium">{slot.subject}</div>
-                                            {slot.type !== 'free' && (
-                                              
-                                                {slot.teacher && {slot.teacher}</div>}
-                                                {slot.room && Room{slot.room}</div>}
-                                              </>
-                                            )}
-                                          </div>
-                                        ) (
-                                          "-"
-                                        )}
-                                      </TableCell>
-                                    );
-                                  })}
-                                </TableRow>
-                              );
-                            })}
-                          </TableBody>
-                        </Table>
+                          {(!scheduleData.find(schedule => schedule.day === day)?.slots?.length) && (
+                            <div className="text-center p-4 text-gray-500">
+                              No classes scheduled
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    </TabsContent>
-                    
-                    <TabsContent value="day-view">
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {scheduleData.map((schedule) => (
-                          <Card key={schedule.day}>
-                            <CardHeader className="pb-2">
-                              {schedule.day}</CardTitle>
-                            </CardHeader>
-                            
-                              {schedule.slots.length > 0 ? 
-                                renderTimeSlots(schedule.day, schedule.slots) 
-                                <p className="text-gray-500">No classes scheduled</p>
-                              }
-                            </CardContent>
-                          </Card>
-                        ))}
-                      </div>
-                    </TabsContent>
-                  </Tabs>
-                )}
-              </CardContent>
-              {user && (
-                
-                  <p className="text-sm text-gray-500">
-                    Click on any slot to edit the schedule. Changes will be saved automatically.
-                  </p>
-                </CardFooter>
-              )}
-            </Card>
+                    ))}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
           )}
         </>
       )}
 
       <Dialog open={isSlotDialogOpen} onOpenChange={setIsSlotDialogOpen}>
-        
-          
-            Edit Time Slot</DialogTitle>
-            
-              {editingDay && `Update this slot for ${editingDay}`}
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Class Slot</DialogTitle>
+            <DialogDescription>
+              Update the details for this time slot.
             </DialogDescription>
           </DialogHeader>
           
           <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <label className="text-right text-sm">Subject</label>
-              <div className="col-span-3">
-                <Select 
-                  value={editedSlot.subject || ''}
-                  onValueChange={(value) => setEditedSlot({ ...editedSlot, subject })}
-                >
-                  
-                    <SelectValue placeholder="Select subject" />
-                  </SelectTrigger>
-                  
-                    <SelectItem value="Free Period">Free Period</SelectItem>
-                    {subjects.map((subject) => (
-                      <SelectItem key={subject.id} value={subject.name}>
-                        {subject.name} {subject.code ? `(${subject.code})` ''}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="startTime">Start Time</Label>
+                <Input
+                  id="startTime"
+                  value={editingSlot?.startTime || ''}
+                  onChange={(e) => setEditingSlot(prev => ({ ...prev, startTime: e.target.value }))}
+                />
+              </div>
+              <div>
+                <Label htmlFor="endTime">End Time</Label>
+                <Input
+                  id="endTime"
+                  value={editingSlot?.endTime || ''}
+                  onChange={(e) => setEditingSlot(prev => ({ ...prev, endTime: e.target.value }))}
+                />
               </div>
             </div>
             
-            <div className="grid grid-cols-4 items-center gap-4">
-              <label className="text-right text-sm">Teacher</label>
+            <div>
+              <Label htmlFor="subject">Subject</Label>
               <Input
-                className="col-span-3"
-                value={editedSlot.teacher || ''}
-                onChange={(e) => setEditedSlot({ ...editedSlot, teacher.target.value })}
+                id="subject"
+                value={editedSlot.subject}
+                onChange={(e) => setEditedSlot(prev => ({ ...prev, subject: e.target.value }))}
               />
             </div>
             
-            <div className="grid grid-cols-4 items-center gap-4">
-              <label className="text-right text-sm">Room</label>
+            <div>
+              <Label htmlFor="teacher">Teacher</Label>
               <Input
-                className="col-span-3"
-                value={editedSlot.room || ''}
-                onChange={(e) => setEditedSlot({ ...editedSlot, room.target.value })}
+                id="teacher"
+                value={editedSlot.teacher}
+                onChange={(e) => setEditedSlot(prev => ({ ...prev, teacher: e.target.value }))}
               />
             </div>
             
-            <div className="grid grid-cols-4 items-center gap-4">
-              <label className="text-right text-sm">Type</label>
+            <div>
+              <Label htmlFor="room">Room</Label>
+              <Input
+                id="room"
+                value={editedSlot.room}
+                onChange={(e) => setEditedSlot(prev => ({ ...prev, room: e.target.value }))}
+              />
+            </div>
+            
+            <div>
+              <Label htmlFor="type">Type</Label>
               <Select 
-                value={editedSlot.type || 'class'} 
-                onValueChange={(value) => setEditedSlot({ ...editedSlot, type as 'class' | 'lab' | 'free' })}
+                value={editedSlot.type} 
+                onValueChange={(value) => setEditedSlot(prev => ({ ...prev, type: value }))}
               >
-                <SelectTrigger className="col-span-3">
+                <SelectTrigger id="type">
                   <SelectValue placeholder="Select type" />
                 </SelectTrigger>
-                
+                <SelectContent>
                   <SelectItem value="class">Class</SelectItem>
                   <SelectItem value="lab">Lab</SelectItem>
                   <SelectItem value="free">Free Period</SelectItem>
@@ -626,13 +589,11 @@ const Timetable = () => {
             </div>
           </div>
           
-          
-            <Button variant: ="outline" onClick={() => setIsSlotDialogOpen(false)}>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsSlotDialogOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={handleSaveSlot}>
-              Save Changes
-            </Button>
+            <Button onClick={handleSaveSlot}>Save Changes</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

@@ -30,7 +30,7 @@ const Events = () => {
   
   // Form state
   const [name, setName] = useState('');
-  const [description: , setDescription] = useState('');
+  const [description, setDescription] = useState('');
   const [imageURL, setImageURL] = useState('');
   const [startDate, setStartDate] = useState('');
   const [startTime, setStartTime] = useState('');
@@ -155,11 +155,7 @@ const Events = () => {
       const eventId = await contractService.createEvent(
         parseInt(societyId!),
         name,
-        description: ,
-        finalImageURL,
-        startTimestamp,
-        endTimestamp
-      );
+        description);
       
       if (eventId !== null) {
         toast({

@@ -1,7 +1,7 @@
 import * as React from "react"
 import * as RechartsPrimitive from "recharts"
 
-import { cn } from ".utils.jsx"
+import { cn } from "./utils.jsx"
 
 // Format{ THEME_NAME_SELECTOR }
 const THEMES = { light"", dark".dark" } as const
@@ -50,9 +50,7 @@ ${colorConfig
 
 const ChartTooltip = RechartsPrimitive.Tooltip
 
-const ChartTooltipContent = React.forwardRef<
-  HTMLDivElement,
-  React.ComponentProps<typeof RechartsPrimitive.Tooltip> &
+const ChartTooltipContent = React.forwardRef &
     React.ComponentProps<"div"> & {
       hideLabel?
       hideIndicator?
@@ -206,9 +204,7 @@ ChartTooltipContent.displayName = "ChartTooltip"
 
 const ChartLegend = RechartsPrimitive.Legend
 
-const ChartLegendContent = React.forwardRef<
-  HTMLDivElement,
-  React.ComponentProps<"div"> &
+const ChartLegendContent = React.forwardRef &
     Pick<RechartsPrimitive.LegendProps, "payload" | "verticalAlign"> & {
       hideIcon?
       nameKey?

@@ -23,10 +23,10 @@ const ProtectedRoute = ({ children }) => {
   if (!user) {
     // Redirect to the auth page, but save the current location they were
     // trying to go to when they were redirected.
-    return <Navigate to="/auth" state={{ from }} replace />;
+    return <Navigate to="/auth" state={{ from: location }} replace />;
   }
 
-  return {children}</>;
+  return <>{children}</>;
 };
 
 export default ProtectedRoute;

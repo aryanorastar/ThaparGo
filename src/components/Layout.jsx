@@ -21,11 +21,11 @@ const Layout = () => {
           <div className="flex justify-center items-center min-h-[50vh]">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-thapar-maroon"></div>
           </div>
-        ) (
+        ) : (
           <motion.div
-            initial={{ opacity0, y10 }}
-            animate={{ opacity1, y0 }}
-            transition={{ duration0.4 }}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
           >
             <Outlet />
           </motion.div>
