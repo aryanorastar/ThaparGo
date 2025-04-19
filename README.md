@@ -9,6 +9,7 @@
 - 🕒 **Timetable Viewer**: Easily access class schedules for various courses.
 - 🏫 **Classroom Finder**: Check real-time availability and location of classrooms.
 - 📅 **Room Bookings**: Book rooms for society events and academic purposes.
+- 🔗 **Web3 Integration**: Join and create blockchain-based societies and events using wallet authentication.
 
 #### 🧑‍🏫 For Faculty
 - 📘 View and manage teaching schedules and classroom assignments.
@@ -25,6 +26,10 @@
 - **Timetable**: Course-wise class schedule view.
 - **Classroom Finder**: Real-time room availability.
 - **Room Bookings**: Request and manage room bookings.
+- **Web3 Features**:
+  - **Wallet Authentication**: Connect with MetaMask wallet.
+  - **Societies**: Create and manage blockchain-based societies.
+  - **Events**: Create and join events for societies.
 
 ---
 
@@ -37,36 +42,43 @@ Check out the live project:
 
 ### 🛠️ Tech Stack
 
-frontend
+#### Frontend
+- **React (TypeScript)** – UI library for building interactive interfaces
+- **Vite** – Lightning-fast build tool and dev server
+- **Shadcn/UI** – Pre-styled, accessible React component library
+- **Tailwind CSS** – Utility-first CSS framework
+- **Lucide React** – Icon set for React
 
-React (TypeScript) – UI library for building interactive interfaces
-Vite – Lightning-fast build tool and dev server
-Shadcn/UI – Pre-styled, accessible React component library
-Tailwind CSS – Utility-first CSS framework
-Lucide React – Icon set for React
-State & Forms
+#### Web3 Integration
+- **Ethers.js** – Ethereum wallet connection and contract interaction
+- **Hardhat** – Smart contract development and deployment
+- **Solidity** – Smart contract programming language
+- **Polygon Mumbai** – Testnet for blockchain integration
 
-React Hooks – State and lifecycle management
-React Hook Form – Form state and validation
-Backend & Data
+#### State & Forms
+- **React Hooks** – State and lifecycle management
+- **React Hook Form** – Form state and validation
+- **Web3 Context Provider** – Blockchain state management
 
-Supabase – Backend-as-a-service (PostgreSQL DB, Auth, APIs)
-Utilities & Tooling
+#### Backend & Data
+- **Supabase** – Backend-as-a-service (PostgreSQL DB, Auth, APIs)
+- **Smart Contracts** – Decentralized data storage and logic
 
-TypeScript – Type-safe JavaScript
-ESLint – Linting and code quality
-PostCSS, Autoprefixer – CSS processing
-date-fns – Date utilities
-Visualization & UI Enhancements
+#### Utilities & Tooling
+- **TypeScript** – Type-safe JavaScript
+- **ESLint** – Linting and code quality
+- **PostCSS, Autoprefixer** – CSS processing
+- **date-fns** – Date utilities
 
-Radix UI – Accessible React primitives
-Framer Motion – Animations
-Recharts – Data visualization
-Mapbox GL – Interactive maps
-Three.js – 3D graphics
-Testing
+#### Visualization & UI Enhancements
+- **Radix UI** – Accessible React primitives
+- **Framer Motion** – Animations
+- **Recharts** – Data visualization
+- **Mapbox GL** – Interactive maps
+- **Three.js** – 3D graphics
 
-Jest – Testing framework
+#### Testing
+- **Jest** – Testing framework
 
 ---
 
@@ -76,6 +88,10 @@ Jest – Testing framework
 - Admin dashboard for managing bookings
 - Notifications/reminders for bookings and class schedules
 - Mobile responsive design improvements
+- Enhanced Web3 features:
+  - NFT-based event tickets
+  - Decentralized voting for society decisions
+  - Integration with more blockchain networks
 
 ---
 
