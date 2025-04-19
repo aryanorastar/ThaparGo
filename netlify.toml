@@ -11,3 +11,8 @@
   from = "/*"
   to = "/index.html"
   status = 200
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.gpteng.co blob:; connect-src 'self' https://*.supabase.co; img-src 'self' https://*.supabase.co data:; style-src 'self' 'unsafe-inline'; frame-src 'none'; object-src 'none'"
