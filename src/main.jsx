@@ -1,4 +1,4 @@
-if (typeof session === 'undefined') {
+if (typeof window.session === 'undefined') {
   window.session = {};
 }
 
