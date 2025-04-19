@@ -1,0 +1,33 @@
+type SocietyWithSocial = 
+ record {
+   socialMedia: SocialMedia;
+   society: Society;
+ };
+type Society = 
+ record {
+   category: text;
+   description: text;
+   email: text;
+   establishedYear: nat;
+   facultyHead: text;
+   id: text;
+   logoUrl: text;
+   members: nat;
+   name: text;
+   phoneNumber: text;
+   registrationLink: text;
+   registrationStatus: text;
+   room: text;
+ };
+type SocialMedia = 
+ record {
+   facebook: opt text;
+   instagram: opt text;
+   linkedin: opt text;
+ };
+service : {
+  addSociety: (text, text, text, text, text, text, text, text, text, 
+   text, nat, nat, opt text, opt text, opt text) -> (text);
+  getAllSocieties: () -> (vec SocietyWithSocial) query;
+  getSocietyById: (text) -> (opt SocietyWithSocial) query;
+}

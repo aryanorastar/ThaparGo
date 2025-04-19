@@ -1,0 +1,417 @@
+
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
+import { Input } from '../components/ui/input';
+import { Label } from '../components/ui/label';
+import { Button } from '../components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
+import { Textarea } from '../components/ui/textarea';
+import { Check, Clock, X } from 'lucide-react';
+import { useToast } from '../components/ui/use-toast';
+import { supabase } from '../integrations/supabase/client';
+import { useAuth } from '../providers/AuthProvider';
+
+const RoomBookings = () => {
+  const { toast } = useToast();
+  const { user } = useAuth();
+  const [bookings, setBookings] = useState([]);
+  const [classrooms, setClassrooms] = useState([]);
+  const [loading, setLoading] = useState(true);
+  
+  // Form state
+  const [formData, setFormData] = useState({
+    roomId'',
+    purpose'',
+    society'',
+    date'',
+    startTime'',
+    endTime'',
+  });
+  
+  // Fetch bookings
+  useEffect(() => {
+    const fetchBookings = async () => {
+      try {
+        if (!user) return;
+        
+        const { data, error } = await supabase
+          .from('room_bookings')
+          .select('*')
+          .eq('user_id', user.id);
+        
+        if (error) {
+          console.error('Error fetching bookings:', error);
+          toast({
+            title: 'Error',
+            description: 'Failed to load bookings.',
+            variant: 'destructive',
+          });
+          return;
+        }
+        
+        // Map the snake_case database fields to camelCase for our RoomBooking type
+        const mappedBookings = data.map(item => ({
+          id.id,
+          roomId.room_id || '',
+          roomName.room_name,
+          purpose.purpose,
+          society.society,
+          date.date,
+          startTime.start_time,
+          endTime.end_time,
+          status.status as 'pending' | 'approved' | 'rejected',
+          userId.user_id,
+          createdAt.created_at
+        }));
+        
+        setBookings(mappedBookings);
+      } catch (error) {
+        console.error('Unexpected error:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const fetchClassrooms = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('classrooms')
+          .select('*');
+        
+        if (error) {
+          console.error('Error fetching classrooms:', error);
+          return;
+        }
+        
+        setClassrooms(data as Classroom[]);
+      } catch (error) {
+        console.error('Unexpected error:', error);
+      }
+    };
+
+    fetchBookings();
+    fetchClassrooms();
+  }, [user, toast]);
+  
+  // Handle form input changes
+  const handleInputChange = (e.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]
+    }));
+  };
+
+  // Handle switching to new booking tab
+  const switchToNewBookingTab = () => {
+    const element = document.querySelector('[data-value="new-booking"]');
+    if (element instanceof HTMLElement) {
+      element.click();
+    }
+  };
+  
+  // Handle form submission
+  const handleSubmit = async (e.FormEvent) => {
+    e.preventDefault();
+    
+    // Validate form
+    if (!formData.roomId || !formData.purpose || !formData.society || !formData.date || !formData.startTime || !formData.endTime) {
+      toast({
+        title: "Error",
+        description: "Please fill in all fields",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    try {
+      setLoading(true);
+      
+      // Find classroom name
+      const classroom = classrooms.find(room => room.id === formData.roomId);
+      const roomName = classroom ? classroom.name '';
+      
+      // Create new booking
+      const { data, error } = await supabase
+        .from('room_bookings')
+        .insert([
+          {
+            room_id.roomId,
+            room_name,
+            purpose.purpose,
+            society.society,
+            date.date,
+            start_time.startTime,
+            end_time.endTime,
+            status'pending',
+            user_id?.id
+          }
+        ])
+        .select();
+      
+      if (error) {
+        console.error('Error creating booking:', error);
+        toast({
+          title: "Error",
+          description: "Failed to create booking" + error.message,
+          variant: "destructive"
+        });
+        return;
+      }
+      
+      // Add new booking to state with proper mapping
+      if (data) {
+        const newBooking = {
+          id[0].id,
+          roomId[0].room_id || '',
+          roomName[0].room_name,
+          purpose[0].purpose,
+          society[0].society,
+          date[0].date,
+          startTime[0].start_time,
+          endTime[0].end_time,
+          status[0].status as 'pending' | 'approved' | 'rejected',
+          userId[0].user_id,
+          createdAt[0].created_at
+        };
+        setBookings([...bookings, newBooking]);
+      }
+      
+      // Reset form
+      setFormData({
+        roomId'',
+        purpose'',
+        society'',
+        date'',
+        startTime'',
+        endTime'',
+      });
+      
+      toast({
+        title: "Booking Request Submitted",
+        description: "Your room booking request has been submitted and is pending approval.",
+      });
+    } catch (error) {
+      console.error('Unexpected error:', error);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  // Get status badge component
+  const getStatusBadge = (status) => {
+    switch (status) {
+      case 'approved':
+        return (
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+            <Check className="mr-1 h-3 w-3" /> Approved
+          </span>
+        );
+      case 'rejected':
+        return (
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+            <X className="mr-1 h-3 w-3" /> Rejected
+          </span>
+        );
+      default:
+        return (
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+            <Clock className="mr-1 h-3 w-3" /> Pending
+          </span>
+        );
+    }
+  };
+
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-4">Room Bookings</h1>
+      <p className="text-lg mb-8">Request rooms for society events and check booking status.</p>
+      
+      <Tabs defaultValue="my-bookings">
+        <TabsList className="mb-6">
+          <TabsTrigger value="my-bookings">My Bookings</TabsTrigger>
+          <TabsTrigger value="new-booking">New Booking Request</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="my-bookings">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {loading ? (
+              <div className="col-span-2 flex justify-center py-12">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+              </div>
+            ) .length > 0 ? (
+              bookings.map(booking => (
+                <Card key={booking.id}>
+                  
+                    <div className="flex justify-between items-start">
+                      
+                        {booking.purpose}</CardTitle>
+                        {booking.society}</CardDescription>
+                      </div>
+                      {getStatusBadge(booking.status)}
+                    </div>
+                  </CardHeader>
+                  
+                    <div className="space-y-4">
+                      
+                        <h3 className="text-sm font-medium text-gray-500">Room</h3>
+                        {booking.roomName}</p>
+                      </div>
+                      
+                      
+                        <h3 className="text-sm font-medium text-gray-500">Date & Time</h3>
+                        {new Date(booking.date).toLocaleDateString('en-US', { weekday'long', year'numeric', month'long', day'numeric' })}</p>
+                        {booking.startTime} - {booking.endTime}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                  
+                    <div className="w-full text-sm text-gray-500">
+                      {booking.status === 'pending' ? (
+                        'Your booking request is pending approval from the administration.'
+                      ) .status === 'approved' ? (
+                        'Your booking has been approved. Please ensure to follow all guidelines.'
+                      ) (
+                        'Your booking request has been rejected. Contact administration for more details.'
+                      )}
+                    </div>
+                  </CardFooter>
+                </Card>
+              ))
+            ) (
+              <div className="col-span-2 text-center py-12">
+                <h3 className="text-xl font-medium mb-2">No Bookings Found</h3>
+                <p className="text-gray-500">You haven't made unknown room booking requests yet.</p>
+                <Button className="mt-4" onClick={switchToNewBookingTab}>
+                  Make a Booking
+                </Button>
+              </div>
+            )}
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="new-booking">
+          
+            
+              New Room Booking Request</CardTitle>
+              
+                Fill in the details to request a room for your society event or meeting
+              </CardDescription>
+            </CardHeader>
+            
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  
+                    <Label htmlFor="society" className="mb-1 block">Society Name</Label>
+                    <Input
+                      id="society"
+                      name="society"
+                      placeholder="e.g., IEEE Student Branch"
+                      value={formData.society}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                  
+                  
+                    <Label htmlFor="roomId" className="mb-1 block">Room</Label>
+                    <Select name="roomId" value={formData.roomId} onValueChange={(value) => setFormData(prev => ({ ...prev, roomId }))}>
+                      <SelectTrigger id="roomId">
+                        <SelectValue placeholder="Select a room" />
+                      </SelectTrigger>
+                      
+                        {classrooms.map(room => (
+                          <SelectItem key={room.id} value={room.id}>
+                            {room.name} ({room.building}, Capacity{room.capacity})
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  
+                    <Label htmlFor="date" className="mb-1 block">Date</Label>
+                    <Input
+                      id="date"
+                      name="date"
+                      type="date"
+                      value={formData.date}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    
+                      <Label htmlFor="startTime" className="mb-1 block">Start Time</Label>
+                      <Input
+                        id="startTime"
+                        name="startTime"
+                        type="time"
+                        value={formData.startTime}
+                        onChange={handleInputChange}
+                      />
+                    </div>
+                    
+                    
+                      <Label htmlFor="endTime" className="mb-1 block">End Time</Label>
+                      <Input
+                        id="endTime"
+                        name="endTime"
+                        type="time"
+                        value={formData.endTime}
+                        onChange={handleInputChange}
+                      />
+                    </div>
+                  </div>
+                </div>
+                
+                
+                  <Label htmlFor="purpose" className="mb-1 block">Purpose of Booking</Label>
+                  <Textarea
+                    id="purpose"
+                    name="purpose"
+                    placeholder="Provide details about the event or meeting..."
+                    rows={4}
+                    value={formData.purpose}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                
+                <div className="flex justify-end">
+                  <Button type="submit" disabled={loading}>
+                    {loading ? 'Submitting...' 'Submit Booking Request'}
+                  </Button>
+                </div>
+              </form>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+      
+      <Card className="mt-8">
+        
+          Room Booking Guidelines</CardTitle>
+        </CardHeader>
+        
+          <ul className="list-disc pl-5 space-y-2">
+            Bookings must be made at least 3 days in advance.</li>
+            All society bookings require approval from the administration.</li>
+            The society is responsible for keeping the room clean and orderly.</li>
+            Any damage to property will be the responsibility of the society.</li>
+            Booking duration should not exceed 4 hours.</li>
+            Rooms must be vacated on time for subsequent bookings.</li>
+            Food and drinks are not allowed in classrooms and labs.</li>
+            For technical equipment, please specify in the purpose field.</li>
+          </ul>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+export default RoomBookings;

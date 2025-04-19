@@ -1,0 +1,25 @@
+{
+  "canisters": {
+    "thapar_go_assets": {
+      "frontend": {
+        "entrypoint": "index.html"
+      },
+      "source": [
+        "assets",
+        "dist"
+      ],
+      "type": "assets"
+    },
+    "backend": {
+      "main": "src/backend/main.mo",
+      "type": "motoko"
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": ""
+    }
+  },
+  "version": 1
+}
