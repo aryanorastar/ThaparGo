@@ -9,6 +9,60 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      societies: {
+        Row: {
+          id: string
+          name: string
+          description: string
+          category: string
+          logo_url: string | null
+          registration_status: string | null
+          registration_link: string | null
+          faculty_head: string | null
+          room: string | null
+          email: string | null
+          phone_number: string | null
+          instagram: string | null
+          linkedin: string | null
+          facebook: string | null
+          created_at: string | null
+        }
+        Insert: {
+          id?: string
+          name: string
+          description: string
+          category: string
+          logo_url?: string | null
+          registration_status?: string | null
+          registration_link?: string | null
+          faculty_head?: string | null
+          room?: string | null
+          email?: string | null
+          phone_number?: string | null
+          instagram?: string | null
+          linkedin?: string | null
+          facebook?: string | null
+          created_at?: string | null
+        }
+        Update: {
+          id?: string
+          name?: string
+          description?: string
+          category?: string
+          logo_url?: string | null
+          registration_status?: string | null
+          registration_link?: string | null
+          faculty_head?: string | null
+          room?: string | null
+          email?: string | null
+          phone_number?: string | null
+          instagram?: string | null
+          linkedin?: string | null
+          facebook?: string | null
+          created_at?: string | null
+        }
+        Relationships: []
+      }
       batches: {
         Row: {
           branch: string
