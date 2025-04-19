@@ -1,5 +1,5 @@
 
-import { supabase } from '../../integrations/supabase/client';
+import { supabase } from '../src/integrations/supabase/client';
 
 export const seedDatabase = async () => {
   try {
@@ -175,7 +175,7 @@ export const seedDatabase = async () => {
     // Create a function to get all subjects
     try {
       // Using proper TypeScript approach with ts-ignore for RPC calls not in types
-      // @ts-ignore
+      // @ts-expect-error
       const { error: functionError } = await supabase.rpc('create_get_subjects_function', {}, {
         count: 'exact',
       });
@@ -316,7 +316,7 @@ async function createDummySchedules() {
 export const createGetSubjectsFunction = async () => {
   try {
     // Using proper TypeScript approach with ts-ignore for RPC calls not in types
-    // @ts-ignore
+    // @ts-expect-error
     const { error } = await supabase.rpc('execute_sql', {
       sql_query: `
         CREATE OR REPLACE FUNCTION get_all_subjects()

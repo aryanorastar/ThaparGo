@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+import { Classroom } from '../types';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { Input } from '../components/ui/input';
@@ -17,7 +18,7 @@ const RoomBookings = () => {
   const { toast } = useToast();
   const { user } = useAuth();
   const [bookings, setBookings] = useState<RoomBooking[]>([]);
-  const [classrooms, setClassrooms] = useState<any[]>([]);
+  const [classrooms, setClassrooms] = useState<Classroom[]>([]);
   const [loading, setLoading] = useState(true);
   
   // Form state
@@ -85,7 +86,7 @@ const RoomBookings = () => {
           return;
         }
         
-        setClassrooms(data);
+        setClassrooms(data as Classroom[]);
       } catch (error) {
         console.error('Unexpected error:', error);
       }
@@ -288,7 +289,7 @@ const RoomBookings = () => {
             ) : (
               <div className="col-span-2 text-center py-12">
                 <h3 className="text-xl font-medium mb-2">No Bookings Found</h3>
-                <p className="text-gray-500">You haven't made any room booking requests yet.</p>
+                <p className="text-gray-500">You haven't made unknown room booking requests yet.</p>
                 <Button className="mt-4" onClick={switchToNewBookingTab}>
                   Make a Booking
                 </Button>
@@ -321,7 +322,7 @@ const RoomBookings = () => {
                   
                   <div>
                     <Label htmlFor="roomId" className="mb-1 block">Room</Label>
-                    <Select name="roomId" value={formData.roomId} onValueChange={(value) => handleInputChange({ target: { name: 'roomId', value } } as any)}>
+                    <Select name="roomId" value={formData.roomId} onValueChange={(value) => setFormData(prev => ({ ...prev, roomId: value }))}>
                       <SelectTrigger id="roomId">
                         <SelectValue placeholder="Select a room" />
                       </SelectTrigger>

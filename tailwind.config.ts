@@ -75,6 +75,7 @@ export default {
 				md: 'calc(var(--radius) - 2px)',
 				sm: 'calc(var(--radius) - 4px)'
 			},
+			/* eslint-disable */
 			keyframes: {
 				'accordion-down': {
 					from: {
@@ -108,5 +109,5 @@ export default {
 			}
 		}
 	},
-	plugins: [require("tailwindcss-animate")],
+	plugins: [/* eslint-disable-next-line */ require("tailwindcss-animate")],
 } satisfies Config;

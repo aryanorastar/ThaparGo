@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+import { TimeSlot } from '../types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
@@ -21,9 +22,14 @@ const Classrooms = () => {
   const [classrooms, setClassrooms] = useState<Classroom[]>([]);
   const [buildings, setBuildings] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
-  const [availabilityMap, setAvailabilityMap] = useState<Record<string, any>>({});
+  interface RoomAvailability {
+  current: string;
+  todayOccupancy: TimeSlot[];
+}
+const [availabilityMap, setAvailabilityMap] = useState<Record<string, RoomAvailability>>({});
   const [editRoom, setEditRoom] = useState<string | null>(null);
-  const [currentSchedule, setCurrentSchedule] = useState<any[]>([]);
+
+const [currentSchedule, setCurrentSchedule] = useState<TimeSlot[]>([]);
   const { toast } = useToast();
   const { user } = useAuth();
 
@@ -52,7 +58,7 @@ const Classrooms = () => {
         setBuildings(uniqueBuildings);
         
         // Initialize availability data
-        const initialAvailability: Record<string, any> = {};
+        const initialAvailability: Record<string, unknown> = {};
         
         // Get current day's schedule from Supabase schedules table to determine room occupancy
         const currentDay = new Date().toLocaleDateString('en-US', { weekday: 'long' });
@@ -66,10 +72,10 @@ const Classrooms = () => {
         if (scheduleData && scheduleData.length > 0) {
           scheduleData.forEach(schedule => {
             const slots = Array.isArray(schedule.slots) ? schedule.slots : JSON.parse(schedule.slots as string);
-            slots.forEach((slot: any) => {
-              if (slot.room && slot.type !== 'free') {
-                // For simplicity, we'll consider any room mentioned in today's schedule as potentially occupied
-                occupiedRooms.add(slot.room);
+            slots.forEach((slot: unknown) => {
+              const s = slot as TimeSlot;
+              if (s.room && s.type !== 'free') {
+                occupiedRooms.add(s.room);
               }
             });
           });
@@ -81,11 +87,11 @@ const Classrooms = () => {
           
           initialAvailability[room.id] = {
             current: isOccupied ? 'Occupied' : 'Available',
-            todayOccupancy: generateDefaultSchedule(room.name)
+            todayOccupancy: generateDefaultSchedule(room.name) as TimeSlot[]
           };
         });
         
-        setAvailabilityMap(initialAvailability);
+        setAvailabilityMap(initialAvailability as Record<string, RoomAvailability>);
       } catch (error) {
         console.error('Unexpected error:', error);
         toast({
@@ -102,20 +108,27 @@ const Classrooms = () => {
   }, [toast]);
   
   // Generate default schedule
-  const generateDefaultSchedule = (roomName: string) => {
-    // Try to get schedule data for this room from schedules in supabase
-    const defaultSchedule = [
-      { time: '08:00 AM - 09:00 AM', status: 'Available', subject: '' },
-      { time: '09:00 AM - 10:00 AM', status: 'Available', subject: '' },
-      { time: '10:00 AM - 11:00 AM', status: 'Available', subject: '' },
-      { time: '11:00 AM - 12:00 PM', status: 'Available', subject: '' },
-      { time: '12:00 PM - 01:00 PM', status: 'Available', subject: '' },
-      { time: '01:00 PM - 02:00 PM', status: 'Available', subject: '' },
-      { time: '02:00 PM - 03:00 PM', status: 'Available', subject: '' },
-      { time: '03:00 PM - 04:00 PM', status: 'Available', subject: '' },
+  const generateDefaultSchedule = (roomName: string): TimeSlot[] => {
+    // Define time slots for the day
+    const slots = [
+      { startTime: '08:00', endTime: '09:00' },
+      { startTime: '09:00', endTime: '10:00' },
+      { startTime: '10:00', endTime: '11:00' },
+      { startTime: '11:00', endTime: '12:00' },
+      { startTime: '12:00', endTime: '13:00' },
+      { startTime: '13:00', endTime: '14:00' },
+      { startTime: '14:00', endTime: '15:00' },
+      { startTime: '15:00', endTime: '16:00' },
     ];
-    
-    return defaultSchedule;
+    return slots.map((slot, idx) => ({
+      id: `${roomName}-${slot.startTime}-${slot.endTime}`,
+      startTime: slot.startTime,
+      endTime: slot.endTime,
+      subject: '',
+      teacher: '',
+      room: roomName,
+      type: 'free',
+    }));
   };
   
   // Filter classrooms based on search and filters
@@ -340,15 +353,11 @@ const Classrooms = () => {
                                   <TableRow 
                                     key={index}
                                     className={`${
-                                      slot.status === 'Available' ? 'bg-green-50' : 'bg-red-50'
+                                      slot.type === 'free' ? 'bg-green-50' : 'bg-red-50'
                                     }`}
                                   >
-                                    <TableCell className="font-medium">{slot.time}</TableCell>
-                                    <TableCell className={`${
-                                      slot.status === 'Available' ? 'text-green-600' : 'text-red-600'
-                                    }`}>
-                                      {slot.status}
-                                    </TableCell>
+                                    <TableCell className="font-medium">{slot.startTime} - {slot.endTime}</TableCell>
+                                    <TableCell className={`${slot.type === 'free' ? 'text-green-600' : 'text-red-600'}`}>{slot.type === 'free' ? 'Available' : 'Occupied'}</TableCell>
                                     <TableCell>{slot.subject || '-'}</TableCell>
                                   </TableRow>
                                 ))}
@@ -391,34 +400,33 @@ const Classrooms = () => {
               
               <div className="space-y-4 max-h-[60vh] overflow-auto py-4">
                 {currentSchedule.map((slot, index) => (
-                  <div key={index} className="grid grid-cols-12 gap-4 items-center border-b pb-4">
-                    <div className="col-span-4 font-medium">{slot.time}</div>
-                    
-                    <div className="col-span-3">
-                      <Select 
-                        value={slot.status} 
-                        onValueChange={(val) => updateScheduleSlot(index, 'status', val)}
-                      >
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Available">Available</SelectItem>
-                          <SelectItem value="Occupied">Occupied</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
-                    <div className="col-span-5">
-                      <Input
-                        placeholder="Subject or event name"
-                        value={slot.subject}
-                        onChange={(e) => updateScheduleSlot(index, 'subject', e.target.value)}
-                        disabled={slot.status === 'Available'}
-                      />
-                    </div>
-                  </div>
-                ))}
+  <div key={index} className="grid grid-cols-12 gap-4 items-center border-b pb-4">
+    <div className="col-span-4 font-medium">{slot.startTime} - {slot.endTime}</div>
+    <div className="col-span-3">
+      <Select 
+        value={slot.type}
+        onValueChange={(val) => updateScheduleSlot(index, 'type', val)}
+      >
+        <SelectTrigger>
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="free">Available</SelectItem>
+          <SelectItem value="class">Occupied</SelectItem>
+          <SelectItem value="lab">Lab</SelectItem>
+        </SelectContent>
+      </Select>
+    </div>
+    <div className="col-span-5">
+      <Input
+        placeholder="Subject or event name"
+        value={slot.subject}
+        onChange={(e) => updateScheduleSlot(index, 'subject', e.target.value)}
+        disabled={slot.type === 'free'}
+      />
+    </div>
+  </div>
+))}
               </div>
               
               <DialogFooter>

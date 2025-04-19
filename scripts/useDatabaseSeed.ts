@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from 'react';
 import { seedDatabase, createGetSubjectsFunction } from '../scripts/seedDatabase';
-import { supabase } from '../integrations/supabase/client';
+import { supabase } from '../src/integrations/supabase/client';
 
 export const useDatabaseSeed = () => {
   const [isSeeded, setIsSeeded] = useState(false);
@@ -39,7 +39,7 @@ export const fetchSubjects = async () => {
     // Use try/catch instead of direct .catch() on Supabase query
     try {
       // Type assertion for RPC call since it's not in the generated types
-      // @ts-ignore - Ignoring TypeScript error for the RPC function
+      // @ts-expect-error - Custom Supabase RPC function not in generated types
       const { data: rpcData, error: rpcError } = await supabase.rpc('get_all_subjects');
       
       if (!rpcError && rpcData) {
