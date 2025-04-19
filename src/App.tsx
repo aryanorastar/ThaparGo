@@ -10,6 +10,7 @@ import CampusMap from "./pages/CampusMap";
 import Timetable from "./pages/Timetable";
 import Classrooms from "./pages/Classrooms";
 import RoomBookings from "./pages/RoomBookings";
+import AdminBookings from "./pages/AdminBookings";
 import Auth from "./pages/Auth";
 import { AuthProvider } from "./providers/AuthProvider";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -43,6 +44,11 @@ const App = () => {
                   <Route path="/bookings" element={
                     <ProtectedRoute>
                       <RoomBookings />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/admin/bookings" element={
+                    <ProtectedRoute>
+                      <AdminBookings />
                     </ProtectedRoute>
                   } />
                   <Route path="/auth" element={<Auth />} />
