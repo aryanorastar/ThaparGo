@@ -37,11 +37,36 @@ Check out the live project:
 
 ### 🛠️ Tech Stack
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+frontend
+
+React (TypeScript) – UI library for building interactive interfaces
+Vite – Lightning-fast build tool and dev server
+Shadcn/UI – Pre-styled, accessible React component library
+Tailwind CSS – Utility-first CSS framework
+Lucide React – Icon set for React
+State & Forms
+
+React Hooks – State and lifecycle management
+React Hook Form – Form state and validation
+Backend & Data
+
+Supabase – Backend-as-a-service (PostgreSQL DB, Auth, APIs)
+Utilities & Tooling
+
+TypeScript – Type-safe JavaScript
+ESLint – Linting and code quality
+PostCSS, Autoprefixer – CSS processing
+date-fns – Date utilities
+Visualization & UI Enhancements
+
+Radix UI – Accessible React primitives
+Framer Motion – Animations
+Recharts – Data visualization
+Mapbox GL – Interactive maps
+Three.js – 3D graphics
+Testing
+
+Jest – Testing framework
 
 ---
 
