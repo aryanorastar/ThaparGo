@@ -1,12 +1,12 @@
-
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '../integrations/supabase/client.js';
 import { useToast } from '../hooks/use-toast.js';
 
+// Define the context with default values
 const AuthContext = createContext({
-  session,
-  user,
-  loading,
+  session: null,
+  user: null,
+  loading: true,
   signOut: () => {},
 });
 

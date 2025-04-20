@@ -1,20 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../components/ui/collapsible';
 import { Button } from '../components/ui/button';
 import { ChevronDown, ChevronUp, MapPin, School, Home, Utensils, Building } from 'lucide-react';
-import ThaparMap from '../components/ThaparMap';
 import EnhancedThreeDMap from '../components/EnhancedThreeDMap';
 import { supabase } from '../integrations/supabase/client';
-
 
 const CampusMap = () => {
   const [selectedBuildingId, setSelectedBuildingId] = useState(null);
   const [showInfo, setShowInfo] = useState(true);
-  // Auto-load Mapbox token from env if available
-  const envMapboxToken = import.meta.env.VITE_MAPBOX_TOKEN;
-  const [mapboxToken, setMapboxToken] = useState(envMapboxToken || '');
   const [mapType, setMapType] = useState('3d');
   const [locations, setLocations] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -56,10 +50,6 @@ const CampusMap = () => {
 
   const toggleInfo = () => {
     setShowInfo(!showInfo);
-  };
-
-  const handleMapTokenChange = (e) => {
-    setMapboxToken(e.target.value);
   };
 
   const selectedBuilding = selectedBuildingId 
@@ -129,68 +119,16 @@ const CampusMap = () => {
             <div className="mb-4">
               <div className="pb-2">
                 <h2 className="text-2xl font-semibold">Map View</h2>
-                <span className="text-gray-500 text-sm">Select your preferred map type</span>
+                <span className="text-gray-500 text-sm">3D interactive campus view</span>
               </div>
               <div className="flex-1 flex flex-col">
-                <Tabs defaultValue={mapType} onValueChange={setMapType}>
-                  <TabsList className="mb-4">
-                    <TabsTrigger value="3d">3D Model View</TabsTrigger>
-                    <TabsTrigger value="mapbox">Mapbox View</TabsTrigger>
-                  </TabsList>
-                  {mapType === 'mapbox' && (
-                    <div className="space-y-2 mb-5">
-                      <label 
-                        htmlFor="mapbox-token" 
-                        className="block text-sm font-medium text-gray-700"
-                      >
-                        Mapbox Access Token
-                      </label>
-                      <input
-                        id="mapbox-token"
-                        className="w-full h-11 px-4 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
-                        style={{ lineHeight: '44px' }}
-                        type="text"
-                        value={mapboxToken}
-                        onChange={handleMapTokenChange}
-                        placeholder="Enter your Mapbox access token"
-                        aria-describedby="token-help"
-                      />
-                      <small id="token-help" className="block mt-1 text-xs text-blue-600">
-                        <a href="https://account.mapbox.com/" target="_blank" rel="noopener noreferrer">
-                          Get a token at mapbox.com
-                        </a>
-                      </small>
-                    </div>
-                  )}
-                  {mapType === 'mapbox' && !mapboxToken && (
-                    <div className="flex flex-col items-center justify-center h-[450px] bg-gray-100 rounded-lg relative">
-                      <MapPin className="h-12 w-12 text-gray-300 mb-4" />
-                      <p className="text-gray-600 text-center px-5">
-                        Please enter a Mapbox access token to view the map
-                      </p>
-                    </div>
-                  )}
-                  <TabsContent value="3d">
-                    <div className="w-full h-[450px]">
-                      <EnhancedThreeDMap 
-                        onBuildingClick={handleBuildingClick}
-                        selectedBuildingId={selectedBuildingId}
-                      />
-                    </div>
-                  </TabsContent>
-                  <TabsContent value="mapbox">
-                    {mapboxToken && (
-                      <div className="w-full h-[450px]">
-                        <ThaparMap 
-                          locations={locations}
-                          accessToken={mapboxToken}
-                          onMarkerClick={handleBuildingClick}
-                          selectedLocationId={selectedBuildingId}
-                        />
-                      </div>
-                    )}
-                  </TabsContent>
-                </Tabs>
+                {/* Removed the Tabs since we're only using 3D view now */}
+                <div className="w-full h-[450px]">
+                  <EnhancedThreeDMap 
+                    onBuildingClick={handleBuildingClick}
+                    selectedBuildingId={selectedBuildingId}
+                  />
+                </div>
               </div>
             </div>
           </div>

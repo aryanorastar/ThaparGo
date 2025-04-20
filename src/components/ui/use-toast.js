@@ -1,3 +1,7 @@
-import { useToast, toast } from "../../hooks/use-toast.js";
+export { useToast } from "../../hooks/use-toast.js";
 
-export { useToast, toast };
+// Simple toast function (customize as needed)
+export function toast({ title, description }) {
+  // Implement your toast logic or integrate with your UI toast library
+  console.log("Toast:", title, description);
+}
