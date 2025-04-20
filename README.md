@@ -37,16 +37,40 @@ A comprehensive campus management system for Thapar University, integrating Web3
 - Git for version control
 - GitHub for collaboration
 
-## Getting Started
+## Local Development Setup
 
 1. Clone the repository
 2. Install dependencies:
    ```
    npm install
    ```
-3. Start the development server:
+3. Start the local replica:
+   ```
+   dfx start --background
+   ```
+4. Deploy canisters locally:
+   ```
+   dfx deploy
+   ```
+5. Run the frontend:
    ```
    npm run dev
+   ```
+
+## Production Deployment
+
+1. Set network to IC mainnet:
+   ```
+   dfx deploy --network ic
+   ```
+2. Update canister IDs in `canister_ids.json` after deployment
+
+## Troubleshooting
+
+- If DFX can't connect to local replica:
+  ```
+   dfx stop
+   dfx start --clean --background
    ```
 
 ## Future Scope
