@@ -92,4 +92,4 @@ A comprehensive campus management system for Thapar University, integrating Web3
 
 ## Live Demo
 
-Check out our live demo at: [https://thapargo.xyz](https://thapargo.xyz)
+Check out our live demo at: ((https://56uit-caaaa-aaaan-qzy7q-cai.icp0.io/))
