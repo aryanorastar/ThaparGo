@@ -1,5 +1,6 @@
 {
   "canisters": {
+<<<<<<< HEAD
     "thapar_go_assets": {
       "frontend": {
         "entrypoint": "dist/index.html"
@@ -10,6 +11,21 @@
     "backend": {
       "main": "src/backend/main.mo",
       "type": "motoko"
+=======
+    "tech_team_backend": {
+      "main": "src/tech_team_backend/main.mo",
+      "type": "motoko"
+    },
+    "tech_team_frontend": {
+      "dependencies": [
+        "tech_team_backend"
+      ],
+      "source": [
+        "src/tech_team_frontend/dist"
+      ],
+      "type": "assets",
+      "workspace": "tech_team_frontend"
+>>>>>>> 9617e75 (Initial commit.)
     }
   },
   "defaults": {
@@ -20,4 +36,8 @@
   },
   "output_env_file": ".env",
   "version": 1
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 9617e75 (Initial commit.)

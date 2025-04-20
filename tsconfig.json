@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
   "compilerOptions": {
     "target": "es5",
     "lib": [
@@ -31,4 +32,15 @@
   "include": [
     "src"
   ]
+=======
+    "compilerOptions": {
+        "strict": true,
+        "target": "ES2020",
+        "experimentalDecorators": true,
+        "strictPropertyInitialization": false,
+        "moduleResolution": "node",
+        "allowJs": true,
+        "outDir": "HACK_BECAUSE_OF_ALLOW_JS"
+    }
+>>>>>>> 9617e75 (Initial commit.)
 }
