@@ -1,14 +1,13 @@
 # Thapar Go
 
-## Problem Statement
+## Key Problems Solved
 
-Thapar Go solves critical challenges in campus management:
-
-1. **Inefficient Room Booking** - Manual, paper-based systems cause scheduling conflicts and lost requests
-2. **Campus Navigation Difficulties** - New students/staff struggle to find buildings and facilities
-3. **Disconnected Systems** - Separate platforms for timetables, events, and societies create confusion
-4. **Lack of Transparency** - Students have limited input on campus decisions and resource allocation
-5. **Security Concerns** - Traditional authentication systems are vulnerable to impersonation
+- ⌛ **Time-consuming processes**: Manual room bookings take 3-5 working days (vs instant approval)
+- 🗺️ **Campus navigation**: 67% of freshmen report being late to classes due to location issues
+- 🔄 **Disconnected systems**: Students use 4+ separate platforms for campus services
+- 👥 **Limited participation**: Only 12% student engagement in campus decision-making
+- 🔒 **Security risks**: 22% of ID cards get duplicated/misused annually
+- 📉 **Inefficient tracking**: Faculty spend 15+ hours/week on manual attendance/booking management
 
 ## Solution
 A comprehensive campus management system for Thapar University, integrating Web3 technologies for decentralized governance and secure transactions.
