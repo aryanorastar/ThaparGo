@@ -1,5 +1,16 @@
 # Thapar Go
 
+## Problem Statement
+
+Thapar Go solves critical challenges in campus management:
+
+1. **Inefficient Room Booking** - Manual, paper-based systems cause scheduling conflicts and lost requests
+2. **Campus Navigation Difficulties** - New students/staff struggle to find buildings and facilities
+3. **Disconnected Systems** - Separate platforms for timetables, events, and societies create confusion
+4. **Lack of Transparency** - Students have limited input on campus decisions and resource allocation
+5. **Security Concerns** - Traditional authentication systems are vulnerable to impersonation
+
+## Solution
 A comprehensive campus management system for Thapar University, integrating Web3 technologies for decentralized governance and secure transactions.
 
 ## Features
