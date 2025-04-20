@@ -1,0 +1,5 @@
+[workspace]
+members = [
+    "src/identity-kit-example-backend"
+]
+resolver = "2"

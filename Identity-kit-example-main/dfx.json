@@ -1,0 +1,27 @@
+{
+  "canisters": {
+    "identity-kit-example-backend": {
+      "candid": "src/identity-kit-example-backend/identity-kit-example-backend.did",
+      "package": "identity-kit-example-backend",
+      "type": "rust"
+    },
+    "identity-kit-example-frontend": {
+      "dependencies": [
+        "identity-kit-example-backend"
+      ],
+      "source": [
+        "src/identity-kit-example-frontend/dist"
+      ],
+      "type": "assets",
+      "workspace": "identity-kit-example-frontend"
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": ""
+    }
+  },
+  "output_env_file": ".env",
+  "version": 1
+}
