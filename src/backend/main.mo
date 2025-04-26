@@ -4,6 +4,16 @@ import Text "mo:base/Text";
 import HashMap "mo:base/HashMap";
 import Nat "mo:base/Nat";
 import Iter "mo:base/Iter";
+import Principal "mo:base/Principal";
+import Hash "mo:base/Hash";
+import Time "mo:base/Time";
+import Option "mo:base/Option";
+import Result "mo:base/Result";
+import Buffer "mo:base/Buffer";
+import Blob "mo:base/Blob";
+import Nat32 "mo:base/Nat32";
+import Char "mo:base/Char";
+import Int "mo:base/Int";
 
 actor ThaparGo {
   // Society type
@@ -36,9 +46,41 @@ actor ThaparGo {
     socialMedia : SocialMedia;
   };
 
+  // User types
+  type User = {
+    email: Text;
+    passwordHash: Text;
+    createdAt: Int;
+    lastLogin: ?Int;
+  };
+
+  type UserProfile = {
+    email: Text;
+    createdAt: Int;
+  };
+
+  type AuthError = {
+    #InvalidCredentials;
+    #UserNotFound;
+    #UserAlreadyExists;
+    #InvalidEmail;
+    #NotAuthenticated;
+  };
+
+  // Session type
+  type Session = {
+    userId: Text;
+    token: Text;
+    expiresAt: Int;
+  };
+
   // Initialize societies storage
   private var nextId : Nat = 1;
   private let societies = HashMap.HashMap<Text, SocietyWithSocial>(0, Text.equal, Text.hash);
+
+  // Initialize users storage
+  private let users = HashMap.HashMap<Text, User>(0, Text.equal, Text.hash);
+  private let sessions = HashMap.HashMap<Text, Session>(0, Text.equal, Text.hash);
 
   // Add initial data
   private func addInitialData() {
@@ -223,5 +265,172 @@ actor ThaparGo {
 
     societies.put(id, societyWithSocial);
     id
+  };
+
+  // Simple hash function for passwords
+  // Note: In a production environment, use a proper cryptographic hash function
+  private func hashPassword(password: Text): Text {
+    var hash: Nat32 = 0;
+    for (char in password.chars()) {
+      let charCode = Nat32.fromNat(Nat32.toNat(Char.toNat32(char)));
+      hash := (hash *% 31 +% charCode) *% 7919; // Simple hash algorithm
+    };
+    Nat32.toText(hash)
+  };
+
+  // Generate a random session token
+  private func generateToken(email: Text): Text {
+    let now = Time.now();
+    let combined = email # Nat.toText(Int.abs(now));
+    hashPassword(combined) # Nat.toText(Int.abs(now) % 10000)
+  };
+
+  // Validate Thapar email
+  // Converts an ASCII uppercase letter to lowercase, otherwise returns the char unchanged
+  private func charToLower(c : Char) : Char {
+    let code = Char.toNat32(c);
+    if (code >= 65 and code <= 90) { // 'A'..'Z'
+      Char.fromNat32(code + 32)
+    } else {
+      c
+    }
+  };
+
+  private func toLowercaseCustom(t: Text): Text {
+    Text.map(t, charToLower)
+  };
+
+  private func validateThaparEmail(email: Text): Bool {
+    let lowercaseEmail = toLowercaseCustom(email);
+    Text.endsWith(lowercaseEmail, #text "@thapar.edu")
+  };
+
+  // Register a new user
+  public func register(email: Text, password: Text): async Result.Result<UserProfile, Text> {
+    // Validate email format
+    if (not validateThaparEmail(email)) {
+      return #err("Only @thapar.edu email addresses are allowed");
+    };
+
+    // Check if user already exists
+    switch (users.get(email)) {
+      case (?_) {
+        return #err("User with this email already exists");
+      };
+      case null {
+        let passwordHash = hashPassword(password);
+        let now = Time.now();
+        
+        let newUser: User = {
+          email = email;
+          passwordHash = passwordHash;
+          createdAt = now;
+          lastLogin = null;
+        };
+        
+        users.put(email, newUser);
+        
+        let profile: UserProfile = {
+          email = email;
+          createdAt = now;
+        };
+        
+        return #ok(profile);
+      };
+    };
+  };
+
+  // Login a user
+  public func login(email: Text, password: Text): async Result.Result<Session, Text> {
+    switch (users.get(email)) {
+      case (?user) {
+        let inputHash = hashPassword(password);
+        
+        if (Text.equal(inputHash, user.passwordHash)) {
+          // Update last login time
+          let now = Time.now();
+          let updatedUser: User = {
+            email = user.email;
+            passwordHash = user.passwordHash;
+            createdAt = user.createdAt;
+            lastLogin = ?now;
+          };
+          users.put(email, updatedUser);
+          
+          // Create a new session
+          let token = generateToken(email);
+          let expiresAt = now + 7 * 24 * 60 * 60 * 1000000000; // 7 days in nanoseconds
+          
+          let session: Session = {
+            userId = email;
+            token = token;
+            expiresAt = expiresAt;
+          };
+          
+          sessions.put(token, session);
+          
+          return #ok(session);
+        } else {
+          return #err("Invalid password");
+        };
+      };
+      case null {
+        return #err("User not found");
+      };
+    };
+  };
+
+  // Validate a session token
+  public query func validateSession(token: Text): async Bool {
+    switch (sessions.get(token)) {
+      case (?session) {
+        let now = Time.now();
+        now < session.expiresAt
+      };
+      case null {
+        false
+      };
+    };
+  };
+
+  // Get user profile by token
+  public query func getUserProfile(token: Text): async Result.Result<UserProfile, Text> {
+    switch (sessions.get(token)) {
+      case (?session) {
+        let now = Time.now();
+        if (now < session.expiresAt) {
+          switch (users.get(session.userId)) {
+            case (?user) {
+              let profile: UserProfile = {
+                email = user.email;
+                createdAt = user.createdAt;
+              };
+              return #ok(profile);
+            };
+            case null {
+              return #err("User not found");
+            };
+          };
+        } else {
+          return #err("Session expired");
+        };
+      };
+      case null {
+        return #err("Invalid session");
+      };
+    };
+  };
+
+  // Logout a user
+  public func logout(token: Text): async Bool {
+    switch (sessions.get(token)) {
+      case (?_) {
+        sessions.delete(token);
+        true
+      };
+      case null {
+        false
+      };
+    };
   };
 }
